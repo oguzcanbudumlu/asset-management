@@ -37,31 +37,40 @@ func (c *WalletController) CreateWallet(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusCreated).JSON(wallet)
 }
 
-// GetWallets retrieves all wallets
-// @Summary Get all wallets
-// @Description Retrieve all wallets from the database
-// @Produce json
-// @Success 200 {array} Wallet
-// @Failure 500 {string} string "Failed to retrieve wallets"
-// @Router /wallet [get]
-func (c *WalletController) GetWallets(ctx *fiber.Ctx) error {
-	wallets, err := c.Service.GetWallets()
+// GetWallet retrieves a wallet by network and address
+// @Summary Get a wallet by network and address
+// @Description Retrieve a wallet by its network and address
+// @Param network path string true "Wallet network"
+// @Param address path string true "Wallet address"
+// @Success 200 {object} Wallet
+// @Failure 404 {string} string "Wallet not found"
+// @Failure 500 {string} string "Failed to retrieve wallet"
+// @Router /wallet/{network}/{address} [get]
+func (c *WalletController) GetWallet(ctx *fiber.Ctx) error {
+	network := ctx.Params("network")
+	address := ctx.Params("address")
+
+	wallet, err := c.Service.GetWallet(network, address)
 	if err != nil {
-		return ctx.Status(http.StatusInternalServerError).SendString("Failed to retrieve wallets")
+		return ctx.Status(http.StatusNotFound).SendString("Wallet not found")
 	}
-	return ctx.JSON(wallets)
+	return ctx.JSON(wallet)
 }
 
-// DeleteWallet deletes a wallet by address
+// DeleteWallet deletes a wallet by address and network
 // @Summary Delete a wallet
-// @Description Delete a wallet by its address
+// @Description Delete a wallet by its address and network
 // @Param address path string true "Wallet address"
+// @Param network path string true "Wallet network"
 // @Success 204 {string} string "No content"
 // @Failure 404 {string} string "Wallet not found"
-// @Router /wallet/{address} [delete]
+// @Failure 500 {string} string "Failed to delete wallet"
+// @Router /wallet/{network}/{address} [delete]
 func (c *WalletController) DeleteWallet(ctx *fiber.Ctx) error {
+	network := ctx.Params("network")
 	address := ctx.Params("address")
-	if err := c.Service.DeleteWallet(address); err != nil {
+
+	if err := c.Service.DeleteWallet(network, address); err != nil {
 		return ctx.Status(http.StatusNotFound).SendString("Wallet not found")
 	}
 	return ctx.SendStatus(http.StatusNoContent)

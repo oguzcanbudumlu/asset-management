@@ -31,17 +31,18 @@ func main() {
 	})
 
 	appInstance.Fiber.Get("/swagger/*", fiberSwagger.WrapHandler)
-	if err := db.Conn.AutoMigrate(&Wallet{}); err != nil {
+	if err := db.Conn.AutoMigrate(&Wallet{}, &WalletDeleted{}); err != nil {
 		log.Error().Err(err).Msg("Failed to migrate database schema")
 		return
 	}
+
 	walletRepo := NewWalletRepository(db.Conn)
 	walletService := NewWalletService(walletRepo)
 	walletController := NewWalletController(walletService)
 
 	appInstance.Fiber.Post("/wallet", walletController.CreateWallet)
-	appInstance.Fiber.Get("/wallet", walletController.GetWallets)
-	appInstance.Fiber.Delete("/wallet/:address", walletController.DeleteWallet)
+	appInstance.Fiber.Get("/wallet/:network/:address", walletController.GetWallet)
+	appInstance.Fiber.Delete("/wallet/:network/:address", walletController.DeleteWallet)
 
 	log.Info().Msg("Wallet Service is running on port 8000")
 	appInstance.Start(":8000")

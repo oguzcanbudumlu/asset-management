@@ -12,10 +12,10 @@ func (s *WalletService) CreateWallet(wallet *Wallet) error {
 	return s.Repo.CreateWallet(wallet)
 }
 
-func (s *WalletService) GetWallets() ([]Wallet, error) {
-	return s.Repo.GetWallets()
+func (s *WalletService) DeleteWallet(network, address string) error {
+	return s.Repo.DeleteWallet(network, address)
 }
 
-func (s *WalletService) DeleteWallet(address string) error {
-	return s.Repo.DeleteWallet(address)
+func (s *WalletService) GetWallet(network, address string) (*Wallet, error) {
+	return s.Repo.GetWallet(network, address)
 }
