@@ -36,13 +36,13 @@ func main() {
 		return
 	}
 
-	walletRepo := NewWalletRepository(db.Conn)
-	walletService := NewWalletService(walletRepo)
-	walletController := NewWalletController(walletService)
+	repo := NewWalletRepository(db.Conn)
+	service := NewWalletService(repo)
+	controller := NewWalletController(service)
 
-	appInstance.Fiber.Post("/wallet", walletController.CreateWallet)
-	appInstance.Fiber.Get("/wallet/:network/:address", walletController.GetWallet)
-	appInstance.Fiber.Delete("/wallet/:network/:address", walletController.DeleteWallet)
+	appInstance.Fiber.Post("/wallet", controller.CreateWallet)
+	appInstance.Fiber.Get("/wallet/:network/:address", controller.GetWallet)
+	appInstance.Fiber.Delete("/wallet/:network/:address", controller.DeleteWallet)
 
 	log.Info().Msg("Wallet Service is running on port 8000")
 	appInstance.Start(":8000")

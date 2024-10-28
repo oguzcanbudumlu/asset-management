@@ -1,21 +1,26 @@
 package main
 
-type WalletService struct {
-	Repo *WalletRepository
+type walletService struct {
+	repo WalletRepository
+}
+type WalletService interface {
+	CreateWallet(wallet *Wallet) error
+	GetWallet(network, address string) (*Wallet, error)
+	DeleteWallet(network, address string) error
 }
 
-func NewWalletService(repo *WalletRepository) *WalletService {
-	return &WalletService{Repo: repo}
+func NewWalletService(repo WalletRepository) WalletService {
+	return &walletService{repo: repo}
 }
 
-func (s *WalletService) CreateWallet(wallet *Wallet) error {
-	return s.Repo.CreateWallet(wallet)
+func (s *walletService) CreateWallet(wallet *Wallet) error {
+	return s.repo.CreateWallet(wallet)
 }
 
-func (s *WalletService) DeleteWallet(network, address string) error {
-	return s.Repo.DeleteWallet(network, address)
+func (s *walletService) DeleteWallet(network, address string) error {
+	return s.repo.DeleteWallet(network, address)
 }
 
-func (s *WalletService) GetWallet(network, address string) (*Wallet, error) {
-	return s.Repo.GetWallet(network, address)
+func (s *walletService) GetWallet(network, address string) (*Wallet, error) {
+	return s.repo.GetWallet(network, address)
 }

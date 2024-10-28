@@ -5,16 +5,24 @@ import (
 	"gorm.io/gorm"
 )
 
-type WalletRepository struct {
-	DB *gorm.DB
+// WalletRepository defines the methods for wallet data persistence
+type WalletRepository interface {
+	CreateWallet(wallet *Wallet) error
+	GetWallets() ([]Wallet, error)
+	DeleteWallet(network, address string) error
+	GetWallet(network, address string) (*Wallet, error)
 }
 
-func NewWalletRepository(db *gorm.DB) *WalletRepository {
-	return &WalletRepository{DB: db}
+type walletRepository struct {
+	db *gorm.DB
 }
 
-func (r *WalletRepository) CreateWallet(wallet *Wallet) error {
-	return r.DB.Transaction(func(tx *gorm.DB) error {
+func NewWalletRepository(db *gorm.DB) WalletRepository {
+	return &walletRepository{db: db}
+}
+
+func (r *walletRepository) CreateWallet(wallet *Wallet) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Check if the wallet with the same address and network already exists
 		var count int64
 		if err := tx.Model(&Wallet{}).Where("address = ? AND network = ?", wallet.Address, wallet.Network).Count(&count).Error; err != nil {
@@ -29,16 +37,16 @@ func (r *WalletRepository) CreateWallet(wallet *Wallet) error {
 	})
 }
 
-func (r *WalletRepository) GetWallets() ([]Wallet, error) {
+func (r *walletRepository) GetWallets() ([]Wallet, error) {
 	var wallets []Wallet
-	if err := r.DB.Find(&wallets).Error; err != nil {
+	if err := r.db.Find(&wallets).Error; err != nil {
 		return nil, err
 	}
 	return wallets, nil
 }
 
-func (r *WalletRepository) DeleteWallet(network, address string) error {
-	return r.DB.Transaction(func(tx *gorm.DB) error {
+func (r *walletRepository) DeleteWallet(network, address string) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Move the wallet to wallet_deleted table
 		var wallet Wallet
 		if err := tx.Where("network = ? AND address = ?", network, address).First(&wallet).Error; err != nil {
@@ -60,9 +68,9 @@ func (r *WalletRepository) DeleteWallet(network, address string) error {
 	})
 }
 
-func (r *WalletRepository) GetWallet(network, address string) (*Wallet, error) {
+func (r *walletRepository) GetWallet(network, address string) (*Wallet, error) {
 	var wallet Wallet
-	if err := r.DB.Where("network = ? AND address = ?", network, address).First(&wallet).Error; err != nil {
+	if err := r.db.Where("network = ? AND address = ?", network, address).First(&wallet).Error; err != nil {
 		return nil, err
 	}
 	return &wallet, nil

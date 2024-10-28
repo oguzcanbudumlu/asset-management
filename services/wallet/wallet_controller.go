@@ -5,14 +5,20 @@ import (
 	"net/http"
 )
 
+type WalletController interface {
+	CreateWallet(ctx *fiber.Ctx) error
+	GetWallet(ctx *fiber.Ctx) error
+	DeleteWallet(ctx *fiber.Ctx) error
+}
+
 // WalletController struct
-type WalletController struct {
-	Service *WalletService
+type walletController struct {
+	service WalletService
 }
 
 // NewWalletController creates a new WalletController
-func NewWalletController(service *WalletService) *WalletController {
-	return &WalletController{Service: service}
+func NewWalletController(service WalletService) WalletController {
+	return &walletController{service: service}
 }
 
 // CreateWallet creates a new wallet
@@ -24,13 +30,13 @@ func NewWalletController(service *WalletService) *WalletController {
 // @Failure 400 {string} string "Invalid request"
 // @Failure 500 {string} string "Failed to create wallet"
 // @Router /wallet [post]
-func (c *WalletController) CreateWallet(ctx *fiber.Ctx) error {
+func (c *walletController) CreateWallet(ctx *fiber.Ctx) error {
 	var wallet Wallet
 	if err := ctx.BodyParser(&wallet); err != nil {
 		return ctx.Status(http.StatusBadRequest).SendString("Invalid request")
 	}
 
-	if err := c.Service.CreateWallet(&wallet); err != nil {
+	if err := c.service.CreateWallet(&wallet); err != nil {
 		return ctx.Status(http.StatusInternalServerError).SendString("Failed to create wallet")
 	}
 
@@ -46,11 +52,11 @@ func (c *WalletController) CreateWallet(ctx *fiber.Ctx) error {
 // @Failure 404 {string} string "Wallet not found"
 // @Failure 500 {string} string "Failed to retrieve wallet"
 // @Router /wallet/{network}/{address} [get]
-func (c *WalletController) GetWallet(ctx *fiber.Ctx) error {
+func (c *walletController) GetWallet(ctx *fiber.Ctx) error {
 	network := ctx.Params("network")
 	address := ctx.Params("address")
 
-	wallet, err := c.Service.GetWallet(network, address)
+	wallet, err := c.service.GetWallet(network, address)
 	if err != nil {
 		return ctx.Status(http.StatusNotFound).SendString("Wallet not found")
 	}
@@ -66,11 +72,11 @@ func (c *WalletController) GetWallet(ctx *fiber.Ctx) error {
 // @Failure 404 {string} string "Wallet not found"
 // @Failure 500 {string} string "Failed to delete wallet"
 // @Router /wallet/{network}/{address} [delete]
-func (c *WalletController) DeleteWallet(ctx *fiber.Ctx) error {
+func (c *walletController) DeleteWallet(ctx *fiber.Ctx) error {
 	network := ctx.Params("network")
 	address := ctx.Params("address")
 
-	if err := c.Service.DeleteWallet(network, address); err != nil {
+	if err := c.service.DeleteWallet(network, address); err != nil {
 		return ctx.Status(http.StatusNotFound).SendString("Wallet not found")
 	}
 	return ctx.SendStatus(http.StatusNoContent)
