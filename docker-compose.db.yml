@@ -1,0 +1,14 @@
+services:
+  local-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: local
+      POSTGRES_PASSWORD: local
+      POSTGRES_DB: local
+    ports:
+      - "5431:5432"
+    volumes:
+      - local_db_data:/var/lib/postgresql/data
+
+volumes:
+  local_db_data:

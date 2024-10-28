@@ -14,23 +14,23 @@ import (
 )
 
 type App struct {
-	fiber *fiber.App
+	Fiber *fiber.App
 }
 
 func NewApp() *App {
 	logger.InitLogger(zerolog.InfoLevel)
 	return &App{
-		fiber: fiber.New(),
+		Fiber: fiber.New(),
 	}
 }
 
 func (a *App) AddRoute(path string, handler fiber.Handler) {
-	a.fiber.Get(path, handler)
+	a.Fiber.Get(path, handler)
 }
 
 func (a *App) Start(port string) {
 	go func() {
-		if err := a.fiber.Listen(port); err != nil {
+		if err := a.Fiber.Listen(port); err != nil {
 			log.Fatal().Err(err).Msg("Error starting server")
 		}
 	}()
@@ -39,7 +39,7 @@ func (a *App) Start(port string) {
 }
 
 func (a *App) Shutdown(ctx context.Context) error {
-	return a.fiber.ShutdownWithContext(ctx)
+	return a.Fiber.ShutdownWithContext(ctx)
 }
 
 func (a *App) setupGracefulShutdown(timeout time.Duration) {
