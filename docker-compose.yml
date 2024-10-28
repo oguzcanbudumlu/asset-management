@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  asset-service:
+    build:
+      context: .
+      dockerfile: services/asset/Dockerfile
+    ports:
+      - "8000:8000"
+
+  wallet-service:
+    build:
+      context: .
+      dockerfile: services/wallet/Dockerfile
+    ports:
+      - "8001:8001"
+
