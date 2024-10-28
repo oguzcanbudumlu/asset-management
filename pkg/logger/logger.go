@@ -7,6 +7,5 @@ import (
 )
 
 func InitLogger(level zerolog.Level) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	zerolog.SetGlobalLevel(level)
+	log.Logger = zerolog.New(os.Stderr).With().Timestamp().Logger().Level(level)
 }
