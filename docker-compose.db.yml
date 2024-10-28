@@ -1,14 +1,26 @@
 services:
-  local-db:
+  wallet-db:
     image: postgres:13
     environment:
-      POSTGRES_USER: local
-      POSTGRES_PASSWORD: local
-      POSTGRES_DB: local
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet
+      POSTGRES_DB: wallet
+    ports:
+      - "5430:5432"
+    volumes:
+      - wallet_db_data:/var/lib/postgresql/data
+
+  asset-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: asset
+      POSTGRES_PASSWORD: asset
+      POSTGRES_DB: asset
     ports:
       - "5431:5432"
     volumes:
-      - local_db_data:/var/lib/postgresql/data
+      - asset_db_data:/var/lib/postgresql/data
 
 volumes:
-  local_db_data:
+  wallet_db_data:
+  asset_db_data:

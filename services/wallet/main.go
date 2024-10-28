@@ -2,6 +2,7 @@ package main
 
 import (
 	"asset-management/pkg/app"
+	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
 	_ "asset-management/services/wallet/docs"
 	"github.com/gofiber/fiber/v2"
@@ -13,33 +14,50 @@ import (
 // @title Wallet Service API
 // @version 1.0
 // @description API documentation for Wallet Service.
-// @host localhost:8001
 // @BasePath /
 func main() {
-	logger.InitLogger(zerolog.InfoLevel)
+	logger.InitLogger(zerolog.DebugLevel)
+	db, err := newDb()
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to initialize database")
+		return
+	}
+	defer db.Close()
 
 	appInstance := app.NewApp()
 
 	appInstance.Fiber.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/swagger/index.html")
 	})
-	appInstance.AddRoute("/wallet", simpleGet)
 
 	appInstance.Fiber.Get("/swagger/*", fiberSwagger.WrapHandler)
+	if err := db.Conn.AutoMigrate(&Wallet{}); err != nil {
+		log.Error().Err(err).Msg("Failed to migrate database schema")
+		return
+	}
+	walletRepo := NewWalletRepository(db.Conn)
+	walletService := NewWalletService(walletRepo)
+	walletController := NewWalletController(walletService)
 
-	log.Info().Msg("Wallet Service is running on port 8001")
-	appInstance.Start(":8001")
+	appInstance.Fiber.Post("/wallet", walletController.CreateWallet)
+	appInstance.Fiber.Get("/wallet", walletController.GetWallets)
+	appInstance.Fiber.Delete("/wallet/:address", walletController.DeleteWallet)
+
+	log.Info().Msg("Wallet Service is running on port 8000")
+	appInstance.Start(":8000")
 }
 
-// simpleGet is an endpoint to get the status of the Wallet Service
-// @Summary Get wallet status
-// @Description Returns the status of the wallet service
-// @Tags Wallet
-// @Accept json
-// @Produce json
-// @Success 200 {string} string "Wallet Service is running"
-// @Router /wallet [get]
-func simpleGet(c *fiber.Ctx) error {
-	log.Info().Msg("Handling wallet request")
-	return c.SendString("Wallet Service is running")
+func newDb() (*database.Database, error) {
+	//dbHost := os.Getenv("DB_HOST")
+	//dbPort := os.Getenv("DB_PORT")
+	//dbUser := os.Getenv("DB_USER")
+	//dbPassword := os.Getenv("DB_PASSWORD")
+	//dbName := os.Getenv("DB_NAME")
+	dbHost := "localhost"
+	dbPort := "5430"
+	dbUser := "wallet"
+	dbPassword := "wallet"
+	dbName := "wallet"
+
+	return database.NewDatabase(dbHost, dbPort, dbUser, dbPassword, dbName)
 }

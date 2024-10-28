@@ -6,4 +6,4 @@ db-up:
 # Stop PostgreSQL
 .PHONY: db-down
 db-down:
-	docker-compose -f docker-compose.db.yml down
+	docker-compose -f docker-compose.db.yml down -v

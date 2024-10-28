@@ -23,7 +23,7 @@ func main() {
 
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 	log.Info().Msg("Asset Service is running on port 8000")
-	appInstance.Start(":8000")
+	appInstance.Start(":8001")
 }
 
 // SimpleGet
