@@ -75,6 +75,22 @@ services:
       - custom
     restart: unless-stopped
 
+  transaction-consumer:
+    build:
+      context: .
+      dockerfile: services/transaction-consumer/Dockerfile
+    environment:
+      DB_HOST: wallet-db
+      DB_PORT: 5432
+      DB_USERNAME: wallet
+      DB_PASSWORD: wallet
+      DB_NAME: wallet
+    depends_on:
+      - kafka1
+    networks:
+      - custom
+    restart: unless-stopped
+
 
   wallet-db:
     image: postgres:13
