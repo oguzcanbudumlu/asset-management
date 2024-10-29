@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type depositService struct {
 	depositRepository DepositRepository
@@ -20,16 +23,23 @@ func (s *depositService) Deposit(walletAddress, network string, amount float64) 
 		return "", 0, errors.New("invalid input parameters")
 	}
 
-	// Validate wallet with the Wallet Management Service
+	// Validate the wallet using WalletValidationAdapter
 	isValid, err := s.validationAdapter.ValidateWallet(walletAddress, network)
 	if err != nil {
-		return "", 0, err
+		return "", 0, fmt.Errorf("wallet validation failed: %w", err)
 	}
 	if !isValid {
 		return "", 0, errors.New("wallet is invalid or inactive")
 	}
 
-	// Retrieve current balance
+	// Perform the deposit transaction
+	newBalance, err := s.depositRepository.Deposit(walletAddress, network, amount)
+	if err != nil {
+		return "", 0, fmt.Errorf("deposit transaction failed: %w", err)
+	}
 
-	return "", 0, nil
+	// Generate a mock transaction ID for the response
+	transactionID := "txn_" + walletAddress[:6] + "123"
+
+	return transactionID, newBalance, nil
 }

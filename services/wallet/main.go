@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
+	"os"
 )
 
 // @title Wallet Service API
@@ -49,16 +50,11 @@ func main() {
 }
 
 func newDb() (*database.Database, error) {
-	//dbHost := os.Getenv("DB_HOST")
-	//dbPort := os.Getenv("DB_PORT")
-	//dbUser := os.Getenv("DB_USER")
-	//dbPassword := os.Getenv("DB_PASSWORD")
-	//dbName := os.Getenv("DB_NAME")
-	dbHost := "localhost"
-	dbPort := "5430"
-	dbUser := "wallet"
-	dbPassword := "wallet"
-	dbName := "wallet"
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USERNAME")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
 
 	return database.NewDatabase(dbHost, dbPort, dbUser, dbPassword, dbName)
 }

@@ -4,12 +4,68 @@ services:
       context: .
       dockerfile: services/asset/Dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - asset-db
+    networks:
+      - custom
+    environment:
+      DB_HOST: asset-db
+      DB_PORT: 5432
+      DB_USERNAME: asset
+      DB_PASSWORD: asset
+      DB_NAME: asset
+    restart: unless-stopped
 
   wallet-service:
     build:
       context: .
       dockerfile: services/wallet/Dockerfile
     ports:
-      - "8001:8001"
+      - "8000:8000"
+    environment:
+      DB_HOST: wallet-db
+      DB_PORT: 5432
+      DB_USERNAME: wallet
+      DB_PASSWORD: wallet
+      DB_NAME: wallet
+    depends_on:
+      - wallet-db
+    networks:
+      - custom
+    restart: unless-stopped
 
+
+  wallet-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: wallet
+      POSTGRES_PASSWORD: wallet
+      POSTGRES_DB: wallet
+    ports:
+      - "5430:5432"
+    volumes:
+      - wallet_db_data:/var/lib/postgresql/data
+    networks:
+      - custom
+
+  asset-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: asset
+      POSTGRES_PASSWORD: asset
+      POSTGRES_DB: asset
+    ports:
+      - "5431:5432"
+    volumes:
+      - asset_db_data:/var/lib/postgresql/data
+    networks:
+      - custom
+
+volumes:
+  wallet_db_data:
+  asset_db_data:
+
+networks:
+  custom:
+    driver: bridge

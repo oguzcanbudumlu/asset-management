@@ -18,6 +18,7 @@ func NewDatabase(dbHost, dbPort, dbUser, dbPassword, dbName string) (*Database, 
 
 	dsn := "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable"
 	dsn = fmt.Sprintf(dsn, dbHost, dbPort, dbUser, dbPassword, dbName)
+	log.Info().Msg(dsn)
 	gormLogger := logger.New(
 		&log.Logger, // Use zerolog as the logger
 		logger.Config{
