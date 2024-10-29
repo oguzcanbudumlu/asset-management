@@ -2,10 +2,10 @@ package main
 
 import (
 	"asset-management/internal/common"
-	"asset-management/internal/deposit"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
+	deposit2 "asset-management/services/asset-api/deposit"
 	_ "asset-management/services/asset-api/docs"
 	"database/sql"
 	"fmt"
@@ -56,10 +56,10 @@ func main() {
 
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 
-	walletValidator := common.NewWalletValidationAdapter("localhost:8080")
-	depositR := deposit.NewDepositRepository(db.Conn)
-	depositS := deposit.NewDepositService(walletValidator, depositR)
-	depositC := deposit.NewDepositController(depositS)
+	walletValidator := common.NewWalletValidationAdapter(os.Getenv("WALLET_API"))
+	depositR := deposit2.NewDepositRepository(db.Conn)
+	depositS := deposit2.NewDepositService(walletValidator, depositR)
+	depositC := deposit2.NewDepositController(depositS)
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")

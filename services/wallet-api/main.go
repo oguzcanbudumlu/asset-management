@@ -1,11 +1,11 @@
 package main
 
 import (
-	"asset-management/internal/wallet"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
 	_ "asset-management/services/wallet-api/docs"
+	wallet2 "asset-management/services/wallet-api/wallet"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -33,14 +33,14 @@ func main() {
 	})
 
 	appInstance.Fiber.Get("/swagger/*", fiberSwagger.WrapHandler)
-	if err := db.Conn.AutoMigrate(&wallet.Wallet{}, &wallet.WalletDeleted{}); err != nil {
+	if err := db.Conn.AutoMigrate(&wallet2.Wallet{}, &wallet2.WalletDeleted{}); err != nil {
 		log.Error().Err(err).Msg("Failed to migrate database schema")
 		return
 	}
 
-	repo := wallet.NewWalletRepository(db.Conn)
-	service := wallet.NewWalletService(repo)
-	controller := wallet.NewWalletController(service)
+	repo := wallet2.NewWalletRepository(db.Conn)
+	service := wallet2.NewWalletService(repo)
+	controller := wallet2.NewWalletController(service)
 
 	appInstance.Fiber.Post("/wallet", controller.CreateWallet)
 	appInstance.Fiber.Get("/wallet/:network/:address", controller.GetWallet)

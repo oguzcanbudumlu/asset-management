@@ -71,6 +71,7 @@ services:
       DB_USERNAME: asset
       DB_PASSWORD: asset
       DB_NAME: asset
+      WALLET_API: http://wallet-api:8000
     restart: unless-stopped
 
   wallet-api:

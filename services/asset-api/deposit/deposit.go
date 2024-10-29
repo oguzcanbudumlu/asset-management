@@ -7,6 +7,5 @@ type DepositRequest struct {
 }
 
 type DepositResponse struct {
-	TransactionID string  `json:"transaction_id" example:"txn_123456789"`
-	NewBalance    float64 `json:"new_balance" example:"1500.75"`
+	NewBalance float64 `json:"new_balance" example:"1500.75"`
 }

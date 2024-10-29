@@ -36,7 +36,7 @@ func (r *depositRepository) Deposit(walletAddress, network string, amount float6
 		INSERT INTO balance (wallet_address, network, balance)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (wallet_address, network) 
-		DO UPDATE SET balance = balance + EXCLUDED.balance
+		DO UPDATE SET balance = balance.balance + EXCLUDED.balance
 		RETURNING balance;
 	`
 

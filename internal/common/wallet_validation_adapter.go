@@ -1,14 +1,13 @@
 package common
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 )
 
 type WalletValidationAdapter interface {
-	ValidateWallet(walletAddress, network string) (bool, error)
+	ValidateWallet(walletAddress, network string) error
 }
 
 type walletValidationAdapter struct {
@@ -19,29 +18,21 @@ func NewWalletValidationAdapter(baseURL string) WalletValidationAdapter {
 	return &walletValidationAdapter{baseURL: baseURL}
 }
 
-func (a *walletValidationAdapter) ValidateWallet(walletAddress, network string) (bool, error) {
+func (a *walletValidationAdapter) ValidateWallet(walletAddress, network string) error {
 	// Create the request URL
-	url := fmt.Sprintf("%s/wallets/validate?walletAddress=%s&network=%s", a.baseURL, walletAddress, network)
+	url := fmt.Sprintf("%s/wallet/%s/%s", a.baseURL, network, walletAddress)
 
 	// Make the HTTP GET request
 	resp, err := http.Get(url)
 	if err != nil {
-		return false, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	// Check if the status code is 200 OK
 	if resp.StatusCode != http.StatusOK {
-		return false, errors.New("failed to validate wallet")
+		return errors.New("failed to validate wallet")
 	}
 
-	// Parse the JSON response (assuming it returns { "isValid": true/false })
-	var result struct {
-		IsValid bool `json:"isValid"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false, err
-	}
-
-	return result.IsValid, nil
+	return nil
 }
