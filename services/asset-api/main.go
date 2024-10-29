@@ -7,6 +7,7 @@ import (
 	"asset-management/pkg/logger"
 	deposit2 "asset-management/services/asset-api/deposit"
 	_ "asset-management/services/asset-api/docs"
+	"asset-management/services/asset-api/withdraw"
 	"database/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
@@ -60,7 +61,14 @@ func main() {
 	depositR := deposit2.NewDepositRepository(db.Conn)
 	depositS := deposit2.NewDepositService(walletValidator, depositR)
 	depositC := deposit2.NewDepositController(depositS)
+
+	withdrawR := withdraw.NewWithdrawRepository(db.Conn)
+	withdrawS := withdraw.NewWithdrawService(withdrawR, walletValidator)
+	withdrawC := withdraw.NewWithdrawController(withdrawS)
+
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
+	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)
+
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")
 }
