@@ -91,6 +91,22 @@ services:
       - custom
     restart: unless-stopped
 
+  transaction-job:
+    build:
+      context: .
+      dockerfile: services/transaction-job/Dockerfile
+    environment:
+      DB_HOST: asset-db
+      DB_PORT: 5432
+      DB_USERNAME: asset
+      DB_PASSWORD: asset
+      DB_NAME: asset
+    depends_on:
+      - asset-db
+    networks:
+      - custom
+    restart: unless-stopped
+
 
   wallet-db:
     image: postgres:13
