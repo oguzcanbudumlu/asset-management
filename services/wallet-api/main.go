@@ -4,7 +4,7 @@ import (
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
-	_ "asset-management/services/wallet/docs"
+	_ "asset-management/services/wallet-api/docs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"

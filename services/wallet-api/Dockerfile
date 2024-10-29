@@ -11,8 +11,8 @@ RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 
 COPY ../../ .
 
-RUN swag init --dir ./services/wallet -o services/wallet/docs
-RUN go build -o wallet-service ./services/wallet/
+RUN swag init --dir ./services/wallet-api -o services/wallet-api/docs
+RUN go build -o wallet-api ./services/wallet-api/
 
 # Run Stage
 FROM alpine:latest
@@ -22,9 +22,9 @@ ENV TZ=Europe/Istanbul
 
 WORKDIR /app
 
-COPY --from=build /app/wallet-service .
+COPY --from=build /app/wallet-api .
 
 EXPOSE 8000
 
 # Uygulamayı başlat
-CMD ["./wallet-service"]
+CMD ["./wallet-api"]

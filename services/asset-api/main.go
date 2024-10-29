@@ -4,7 +4,7 @@ import (
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
-	_ "asset-management/services/asset/docs"
+	_ "asset-management/services/asset-api/docs"
 	"database/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v2"

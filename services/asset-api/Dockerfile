@@ -13,9 +13,9 @@ RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 
 COPY ../../ .
 
-RUN swag init --dir ./services/asset -o services/asset/docs
+RUN swag init --dir ./services/asset-api -o services/asset-api/docs
 
-RUN go build -o asset-service ./services/asset
+RUN go build -o asset-api ./services/asset-api
 
 FROM alpine:latest
 
@@ -24,8 +24,8 @@ ENV TZ=Europe/Istanbul
 
 WORKDIR /app
 
-COPY --from=build /app/asset-service .
+COPY --from=build /app/asset-api .
 
 EXPOSE 8000
 
-CMD ["./asset-service"]
+CMD ["./asset-api"]
