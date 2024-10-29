@@ -103,6 +103,7 @@ services:
       DB_NAME: asset
     depends_on:
       - asset-db
+      - kafka1
     networks:
       - custom
     restart: unless-stopped
