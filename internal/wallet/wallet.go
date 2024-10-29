@@ -1,4 +1,4 @@
-package main
+package wallet
 
 // Wallet struct
 // @Description Represents a wallet in the system

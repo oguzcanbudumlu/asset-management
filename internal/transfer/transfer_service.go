@@ -1,4 +1,4 @@
-package main
+package transfer
 
 type transferService struct {
 	transferRepository TransferRepository

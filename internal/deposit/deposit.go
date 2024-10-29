@@ -1,4 +1,4 @@
-package main
+package deposit
 
 type DepositRequest struct {
 	WalletAddress string  `json:"wallet_address" example:"0x123abc456def"`
@@ -9,8 +9,4 @@ type DepositRequest struct {
 type DepositResponse struct {
 	TransactionID string  `json:"transaction_id" example:"txn_123456789"`
 	NewBalance    float64 `json:"new_balance" example:"1500.75"`
-}
-
-type ErrorResponse struct {
-	Message string `json:"message" example:"Invalid request"`
 }

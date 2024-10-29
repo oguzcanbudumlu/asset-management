@@ -1,4 +1,4 @@
-package main
+package withdraw
 
 type withdrawService struct {
 	withdrawRepository WithdrawRepository

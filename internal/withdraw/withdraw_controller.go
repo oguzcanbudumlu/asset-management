@@ -1,4 +1,4 @@
-package main
+package withdraw
 
 import "github.com/gofiber/fiber/v2"
 

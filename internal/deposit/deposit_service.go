@@ -1,20 +1,21 @@
-package main
+package deposit
 
 import (
+	"asset-management/internal/common"
 	"errors"
 	"fmt"
 )
 
 type depositService struct {
 	depositRepository DepositRepository
-	validationAdapter WalletValidationAdapter
+	validationAdapter common.WalletValidationAdapter
 }
 
 type DepositService interface {
 	Deposit(walletAddress, network string, amount float64) (string, float64, error)
 }
 
-func NewDepositService(adapter WalletValidationAdapter, depositRepository DepositRepository) DepositService {
+func NewDepositService(adapter common.WalletValidationAdapter, depositRepository DepositRepository) DepositService {
 	return &depositService{validationAdapter: adapter, depositRepository: depositRepository}
 }
 func (s *depositService) Deposit(walletAddress, network string, amount float64) (string, float64, error) {

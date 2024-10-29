@@ -1,4 +1,4 @@
-package main
+package wallet
 
 type walletService struct {
 	repo WalletRepository
