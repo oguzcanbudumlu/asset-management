@@ -2,6 +2,7 @@ package main
 
 import (
 	"asset-management/pkg/app"
+	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
@@ -12,29 +13,30 @@ import (
 // @title Asset Service API
 // @version 1.0
 // @description API documentation for Asset Service.
-// @host localhost:8000
+// @host localhost:8081
 // @BasePath /
 func main() {
 	logger.InitLogger(zerolog.InfoLevel)
+	db, err := database.NewDatabaseRaw("localhost", "5431", "asset", "asset", "asset")
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to initialize database")
+		return
+	}
+	defer db.Close()
 
 	appInstance := app.NewApp()
 
-	appInstance.Fiber.Get("/asset", SimpleGet)
+	appInstance.Fiber.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/swagger/index.html")
+	})
 
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
-	log.Info().Msg("Asset Service is running on port 8000")
-	appInstance.Start(":8001")
-}
 
-// SimpleGet
-// @Summary Get asset status
-// @Description Returns the status of the asset service
-// @Tags Asset
-// @Accept json
-// @Produce json
-// @Success 200 {string} string "Asset Service is running"
-// @Router /asset [get]
-func SimpleGet(c *fiber.Ctx) error {
-	log.Info().Msg("Handling asset request")
-	return c.SendString("Asset Service is running")
+	walletValidator := NewWalletValidationAdapter("localhost:8080")
+	depositR := NewDepositRepository(db.Conn)
+	depositS := NewDepositService(walletValidator, depositR)
+	depositC := NewDepositController(depositS)
+	appInstance.Fiber.Post("/deposit", depositC.Deposit)
+	log.Info().Msg("Asset Service is running on port 8081")
+	appInstance.Start(":8001")
 }
