@@ -7,6 +7,8 @@ services:
       ALLOW_ANONYMOUS_LOGIN: 'yes'
     ports:
       - "2181:2181"
+    networks:
+      - custom
 
   kafka1:
     image: bitnami/kafka:3.7.0
@@ -27,6 +29,18 @@ services:
       - "29092:29092"
     volumes:
       - kafka_data1:/bitnami/kafka
+    command:
+      - sh
+      - -c
+      - |
+        /opt/bitnami/scripts/kafka/entrypoint.sh /run.sh &
+        sleep 5
+        # Create test-topic with 1 partition and replication factor of 1
+        kafka-topics.sh --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+        wait
+    networks:
+      - custom
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     depends_on:
@@ -37,6 +51,8 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - custom
 
 
   asset-api:
@@ -85,6 +101,7 @@ services:
       DB_USERNAME: wallet
       DB_PASSWORD: wallet
       DB_NAME: wallet
+      KAFKA_BROKER: kafka1:9092
     depends_on:
       - kafka1
     networks:
