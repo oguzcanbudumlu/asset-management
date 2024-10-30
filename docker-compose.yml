@@ -133,6 +133,7 @@ services:
       POSTGRES_USER: wallet
       POSTGRES_PASSWORD: wallet
       POSTGRES_DB: wallet
+      TZ: "Europe/Istanbul"
     ports:
       - "5430:5432"
     volumes:
@@ -146,6 +147,7 @@ services:
       POSTGRES_USER: asset
       POSTGRES_PASSWORD: asset
       POSTGRES_DB: asset
+      TZ: "Europe/Istanbul"
     ports:
       - "5431:5432"
     volumes:

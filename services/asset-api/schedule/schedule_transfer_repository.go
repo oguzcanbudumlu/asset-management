@@ -7,6 +7,7 @@ import (
 
 type ScheduleTransactionRepository interface {
 	Create(tx *ScheduleTransaction) (int, error)
+	GetNextMinuteTransactions() ([]ScheduleTransaction, error)
 }
 
 type postgresScheduleTransactionRepository struct {
@@ -29,4 +30,31 @@ func (r *postgresScheduleTransactionRepository) Create(tx *ScheduleTransaction) 
 		return 0, fmt.Errorf("failed to insert schedule transaction: %v", err)
 	}
 	return id, nil
+}
+
+func (r *postgresScheduleTransactionRepository) GetNextMinuteTransactions() ([]ScheduleTransaction, error) {
+	rows, err := r.db.Query(`
+        SELECT scheduled_transaction_id, from_wallet_address, to_wallet_address, network, amount, scheduled_time, status, created_at
+        FROM scheduled_transactions
+        WHERE scheduled_time >= NOW() AT TIME ZONE 'Europe/Istanbul'
+          AND scheduled_time < NOW() AT TIME ZONE 'Europe/Istanbul' + INTERVAL '1 minute'`)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var transactions []ScheduleTransaction
+	for rows.Next() {
+		var txn ScheduleTransaction
+		if err := rows.Scan(&txn.ID, &txn.FromWallet, &txn.ToWallet, &txn.Network, &txn.Amount, &txn.ScheduledTime, &txn.Status, &txn.CreatedAt); err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, txn)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, fmt.Errorf("failed to close rows: %w", err)
+	}
+
+	return transactions, nil
 }

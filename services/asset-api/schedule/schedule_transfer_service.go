@@ -8,6 +8,7 @@ import (
 
 type ScheduleTransactionService interface {
 	ScheduleTransaction(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error)
+	GetNextMinuteTransactions() ([]ScheduleTransaction, error)
 }
 
 type scheduleTransactionService struct {
@@ -37,4 +38,8 @@ func (s *scheduleTransactionService) ScheduleTransaction(fromWallet, toWallet, n
 		Status:        StatusPending,
 	}
 	return s.repo.Create(tx)
+}
+
+func (s *scheduleTransactionService) GetNextMinuteTransactions() ([]ScheduleTransaction, error) {
+	return s.repo.GetNextMinuteTransactions()
 }

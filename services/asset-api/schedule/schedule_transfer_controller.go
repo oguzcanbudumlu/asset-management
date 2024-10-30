@@ -42,3 +42,20 @@ func (c *ScheduleTransactionController) CreateScheduleTransaction(ctx *fiber.Ctx
 
 	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"transaction_id": id})
 }
+
+// GetNextMinuteTransactions godoc
+// @Summary Get transactions scheduled for the next minute
+// @Description Retrieve all transactions scheduled for the upcoming minute
+// @Tags ScheduleTransaction
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} ScheduleTransaction
+// @Failure 500 {object} map[string]interface{}
+// @Router /schedule-transaction/next-minute [get]
+func (c *ScheduleTransactionController) GetNextMinuteTransactions(ctx *fiber.Ctx) error {
+	transactions, err := c.service.GetNextMinuteTransactions()
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve transactions"})
+	}
+	return ctx.JSON(transactions)
+}
