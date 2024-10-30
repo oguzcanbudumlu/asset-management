@@ -32,12 +32,12 @@ func (s *service) TriggerPublisher() (int, error) {
 	// Retrieve the topic from environment variables once.
 	topic := os.Getenv("KAFKA_TOPIC")
 
-	// Simulate getting transactions from nextService (replace with actual call if needed).
-	transactions, err := s.nextService.GetNextMinuteTransactions()
-
-	if err != nil {
-		return 0, err
-	}
+	transactions := mockTransactions()
+	//transactions, err := s.nextService.GetNextMinuteTransactions()
+	//
+	//if err != nil {
+	//	return 0, err
+	//}
 
 	var messages []kafka2.Message
 

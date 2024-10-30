@@ -1,8 +1,11 @@
 package main
 
 import (
+	"asset-management/internal/schedule"
+	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
 	"context"
+	"encoding/json"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/segmentio/kafka-go"
@@ -12,32 +15,79 @@ import (
 func main() {
 	logger.InitLogger(zerolog.InfoLevel)
 	kafkaBroker := os.Getenv("KAFKA_BROKER")
-	log.Info().Msg(kafkaBroker)
+	kafkaTopic := os.Getenv("KAFKA_TOPIC")
+	kafkaGroupId := os.Getenv("KAFKA_GROUP_ID")
+
+	if kafkaBroker == "" || kafkaTopic == "" || kafkaGroupId == "" {
+		log.Fatal().Msg("Kafka configuration environment variables (KAFKA_BROKER, KAFKA_TOPIC, KAFKA_GROUP_ID) must be set")
+		return
+	}
+
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: []string{kafkaBroker}, // Kafka broker address
-		Topic:   "test-topic",          // Topic to consume from
-		GroupID: "consumer-group-1",    // Consumer group ID
+		Topic:   kafkaTopic,            // Topic to consume from
+		GroupID: kafkaGroupId,          // Consumer group ID
 	})
 
-	defer reader.Close()
+	defer func() {
+		if err := reader.Close(); err != nil {
+			log.Error().Err(err).Msg("Failed to close Kafka reader")
+		}
+	}()
 
-	log.Info().Msg("Consuming messages from Kafka...")
+	if _, err := reader.FetchMessage(context.Background()); err != nil {
+		log.Error().Err(err).Msg("Failed to connect to Kafka")
+		return
+	}
+	log.Info().
+		Str("broker", kafkaBroker).
+		Str("topic", kafkaTopic).
+		Str("group_id", kafkaGroupId).
+		Msg("Successfully connected to Kafka")
 
+	db, err := database.NewDatabaseRaw(
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"))
+
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to initialize database")
+		return
+	}
+	processRepo := schedule.NewProcessRepository(db.Conn)
+	processServ := schedule.NewProcessService(processRepo)
+
+	// Start consuming messages
 	for {
-		// Read message
+		// Read messages from Kafka
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
 			log.Error().Err(err).Msg("Error reading message")
+			break
+		}
+
+		// Parse message to ScheduleTransaction
+		var transaction schedule.ScheduleTransaction
+		err = json.Unmarshal(msg.Value, &transaction)
+		if err != nil {
+			log.Error().Err(err).Msg("Error parsing message")
 			continue
 		}
 
-		// Log message details
+		// Process the transaction
+		if err := processServ.Process(transaction.ID); err != nil {
+			log.Error().
+				Err(err).
+				Interface("transaction", transaction).
+				Msg("Error processing transaction")
+			continue
+		}
+
+		// Log the successful transaction details
 		log.Info().
-			Str("topic", msg.Topic).
-			Int("partition", msg.Partition).
-			Int64("offset", msg.Offset).
-			Str("key", string(msg.Key)).
-			Str("value", string(msg.Value)).
-			Msg("Received new message")
+			Interface("transaction", transaction).
+			Msg("Consumed transaction")
 	}
 }

@@ -25,7 +25,7 @@ func NewProcessController(service ProcessService) *ProcessController {
 // @Router /scheduled-transaction/{id}/process [post]
 func (c *ProcessController) Process(ctx *fiber.Ctx) error {
 	transactionIDParam := ctx.Params("id")
-	transactionID, err := strconv.ParseInt(transactionIDParam, 10, 64)
+	transactionID, err := strconv.Atoi(transactionIDParam)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid transaction ID",

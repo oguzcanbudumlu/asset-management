@@ -8,7 +8,7 @@ import (
 )
 
 type ProcessRepository interface {
-	Process(scheduledTransactionID int64) error
+	Process(scheduledTransactionID int) error
 }
 
 type postgresProcessRepository struct {
@@ -19,7 +19,7 @@ func NewProcessRepository(db *sql.DB) ProcessRepository {
 	return &postgresProcessRepository{db: db}
 }
 
-func (r *postgresProcessRepository) Process(scheduledTransactionID int64) error {
+func (r *postgresProcessRepository) Process(scheduledTransactionID int) error {
 	ctx := context.Background()
 
 	// Begin transaction

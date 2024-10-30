@@ -5,7 +5,7 @@ import (
 )
 
 type ProcessService interface {
-	Process(scheduledTransactionID int64) error
+	Process(scheduledTransactionID int) error
 }
 
 type processService struct {
@@ -16,7 +16,7 @@ func NewProcessService(repo ProcessRepository) ProcessService {
 	return &processService{repo: repo}
 }
 
-func (s *processService) Process(scheduledTransactionID int64) error {
+func (s *processService) Process(scheduledTransactionID int) error {
 	err := s.repo.Process(scheduledTransactionID)
 	if err != nil {
 		return fmt.Errorf("failed to process transaction: %w", err)
