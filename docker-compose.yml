@@ -109,10 +109,10 @@ services:
       - custom
     restart: unless-stopped
 
-  transaction-job:
+  transaction-outbox-publisher:
     build:
       context: .
-      dockerfile: services/transaction-job/Dockerfile
+      dockerfile: services/transaction-outbox-publisher/Dockerfile
     environment:
       DB_HOST: asset-db
       DB_PORT: 5432

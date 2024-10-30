@@ -11,7 +11,7 @@ RUN go mod download
 
 COPY ../../ .
 
-RUN go build -o transaction-job ./services/transaction-job
+RUN go build -o transaction-outbox-publisher ./services/transaction-outbox-publisher
 
 FROM alpine:latest
 
@@ -20,8 +20,8 @@ ENV TZ=Europe/Istanbul
 
 WORKDIR /app
 
-COPY --from=build /app/transaction-job .
+COPY --from=build /app/transaction-outbox-publisher .
 
 EXPOSE 8000
 
-CMD ["./transaction-job"]
+CMD ["./transaction-outbox-publisher"]
