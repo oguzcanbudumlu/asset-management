@@ -20,11 +20,11 @@ func NewWithdrawController(service WithdrawService) WithdrawController {
 // Withdraw godoc
 // @Summary      Withdraw assets
 // @Description  Withdraws a specified amount into a wallet
-// @Tags         deposit
+// @Tags         withdraw
 // @Accept       json
 // @Produce      json
 // @Param        depositRequest body WithdrawRequest true "Withdraw request payload"
-// @Success      200  {string}  string "withdrawed"
+// @Success      200  "Withdraw operation successful"
 // @Failure      400  {object}  dto.ErrorResponse
 // @Router       /withdraw [post]
 func (c *withdrawController) Withdraw(ctx *fiber.Ctx) error {
@@ -38,5 +38,5 @@ func (c *withdrawController) Withdraw(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ErrorResponse{Message: err.Error()})
 	}
 
-	return ctx.Status(fiber.StatusOK).SendString("Withdrawed")
+	return ctx.SendStatus(fiber.StatusOK)
 }

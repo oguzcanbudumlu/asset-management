@@ -7,6 +7,7 @@ import (
 	"asset-management/pkg/logger"
 	deposit2 "asset-management/services/asset-api/deposit"
 	_ "asset-management/services/asset-api/docs"
+	"asset-management/services/asset-api/transfer"
 	"asset-management/services/asset-api/withdraw"
 	"database/sql"
 	"fmt"
@@ -23,6 +24,19 @@ CREATE TABLE IF NOT EXISTS balance (
 	network VARCHAR(100) NOT NULL,
 	balance NUMERIC(18, 2) NOT NULL DEFAULT 0,
 	UNIQUE (wallet_address, network)
+);
+`
+
+const createScheduledTransactionsTable = `
+CREATE TABLE IF NOT EXISTS scheduled_transactions (
+    scheduled_transaction_id SERIAL PRIMARY KEY,
+    from_wallet_address VARCHAR(255) NOT NULL,
+    to_wallet_address VARCHAR(255) NOT NULL,
+    network VARCHAR(100) NOT NULL,
+    amount NUMERIC(18, 2) NOT NULL CHECK (amount > 0),
+    scheduled_time TIMESTAMP NOT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 `
 
@@ -45,7 +59,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if err := CreateBalanceTable(db.Conn); err != nil {
+	if err := CreateTables(db.Conn); err != nil {
 		log.Fatal().Msgf("Failed to create balance table:", err)
 	}
 
@@ -66,18 +80,28 @@ func main() {
 	withdrawS := withdraw.NewWithdrawService(withdrawR, walletValidator)
 	withdrawC := withdraw.NewWithdrawController(withdrawS)
 
+	transferR := transfer.NewTransferRepository(db.Conn)
+	transferS := transfer.NewTransferService(transferR, walletValidator)
+	transferC := transfer.NewDepositController(transferS)
+
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)
+	appInstance.Fiber.Post("/transfer", transferC.Transfer)
 
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")
 }
 
-func CreateBalanceTable(db *sql.DB) error {
+func CreateTables(db *sql.DB) error {
 	// Execute the query
 	_, err := db.Exec(createBalanceTableSQL)
 	if err != nil {
 		return fmt.Errorf("failed to create balance table: %w", err)
+	}
+
+	_, schErr := db.Exec(createScheduledTransactionsTable)
+	if schErr != nil {
+		return fmt.Errorf("failed to create scheduled table: %w", err)
 	}
 
 	return nil

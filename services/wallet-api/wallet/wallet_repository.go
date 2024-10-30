@@ -45,6 +45,7 @@ func (r *walletRepository) GetWallets() ([]Wallet, error) {
 	return wallets, nil
 }
 
+// todo lock
 func (r *walletRepository) DeleteWallet(network, address string) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Move the wallet to wallet_deleted table
