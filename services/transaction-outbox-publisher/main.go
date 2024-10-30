@@ -1,86 +1,55 @@
 package main
 
 import (
+	"asset-management/internal/schedule"
+	"asset-management/pkg/app"
+	"asset-management/pkg/database"
+	"asset-management/pkg/kafka"
 	"asset-management/pkg/logger"
-	"context"
-	"encoding/json"
+	"asset-management/services/transaction-outbox-publisher/publisher"
+	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/segmentio/kafka-go"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"os"
-	"time"
 )
 
-type Event struct {
-	UserID    string `json:"user_id"`
-	Action    string `json:"action"`
-	Timestamp int64  `json:"timestamp"`
-}
-
+// @title Transaction Outbox Publisher API
+// @version 1.0
+// @description API documentation for Transaction Outbox Publisher Service.
+// @BasePath /
 func main() {
-
 	logger.InitLogger(zerolog.InfoLevel)
-	brokerAddress := os.Getenv("KAFKA_BROKER") // Replace with your Kafka broker address
-	topic := "test-topic"                      // Replace with your topic name
 
-	// Set up Kafka transport
-	transport := &kafka.Transport{
-		ClientID:    "json-producer",
-		DialTimeout: 10 * time.Second,
-	}
+	db, err := database.NewDatabaseRaw(
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"))
 
-	// Create a Kafka writer
-	writer := &kafka.Writer{
-		Addr:      kafka.TCP(brokerAddress),
-		Topic:     topic,
-		Balancer:  &kafka.LeastBytes{},
-		Transport: transport,
-	}
-
-	// Create an event
-	event := Event{
-		UserID:    "12345",
-		Action:    "login",
-		Timestamp: time.Now().Unix(),
-	}
-
-	// Serialize the event to JSON
-	messageBytes, err := json.Marshal(event)
 	if err != nil {
-		log.Error().Err(err).Msg("Failed to serialize event to JSON")
+		log.Error().Err(err).Msg("Failed to initialize database")
 		return
 	}
+	appInstance := app.NewApp()
+	appInstance.Fiber.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/swagger/index.html")
+	})
 
-	// Create a Kafka message with the JSON payload
-	// Using the UserID as a string key
-	message := kafka.Message{
-		Key:   []byte(event.UserID), // Convert string key to []byte
-		Value: messageBytes,
-	}
+	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 
-	// Log before sending the message
-	log.Info().
-		Str("topic", topic).
-		Str("broker", brokerAddress).
-		Str("event", string(messageBytes)).
-		Msg("Producing JSON message to Kafka")
+	nextRepo := schedule.NewNextRepository(db.Conn)
+	nextService := schedule.NewNextService(nextRepo)
+	kafkaProducer := kafka.NewProducer(os.Getenv("KAFKA_BROKER"), os.Getenv("KAFKA_TOPIC"))
 
-	// Produce (send) the message to Kafka
-	if err := writer.WriteMessages(context.Background(), message); err != nil {
-		log.Error().
-			Err(err).
-			Str("topic", topic).
-			Msg("Failed to produce JSON message to Kafka")
-	} else {
-		log.Info().
-			Str("topic", topic).
-			Msg("JSON message produced successfully to Kafka")
-	}
+	s := publisher.NewService(nextService, kafkaProducer)
+	c := publisher.NewController(s)
 
-	// Close the writer explicitly
-	if err := writer.Close(); err != nil {
-		log.Error().Err(err).Msg("Failed to close Kafka writer")
-	} else {
-		log.Info().Msg("Kafka writer closed successfully")
+	appInstance.Fiber.Post("/trigger-publisher", c.TriggerPublisher)
+
+	appInstance.Start(":8002")
+	if dbCloseErr := db.Close(); dbCloseErr != nil {
+		log.Error().Err(dbCloseErr).Msg("Failed to close database connection")
 	}
 }

@@ -58,14 +58,17 @@ func main() {
 		log.Error().Err(err).Msg("Failed to initialize database")
 		return
 	}
-	defer db.Close()
 
 	if err := CreateTables(db.Conn); err != nil {
-		log.Fatal().Msgf("Failed to create balance table:", err)
+		log.Fatal().Err(err).Msg("Failed to create tables")
+		dbCloseErr := db.Close()
+		if dbCloseErr != nil {
+			log.Error().Err(dbCloseErr).Msg("Failed to close database connection after error")
+		}
+		return
 	}
 
 	appInstance := app.NewApp()
-
 	appInstance.Fiber.Get("/", func(c *fiber.Ctx) error {
 		return c.Redirect("/swagger/index.html")
 	})
@@ -98,18 +101,20 @@ func main() {
 
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")
+
+	if dbCloseErr := db.Close(); dbCloseErr != nil {
+		log.Error().Err(dbCloseErr).Msg("Failed to close database connection")
+	}
+
 }
 
 func CreateTables(db *sql.DB) error {
-	// Execute the query
-	_, err := db.Exec(createBalanceTableSQL)
-	if err != nil {
+	if _, err := db.Exec(createBalanceTableSQL); err != nil {
 		return fmt.Errorf("failed to create balance table: %w", err)
 	}
 
-	_, schErr := db.Exec(createScheduledTransactionsTable)
-	if schErr != nil {
-		return fmt.Errorf("failed to create scheduled table: %w", err)
+	if _, schErr := db.Exec(createScheduledTransactionsTable); schErr != nil {
+		return fmt.Errorf("failed to create scheduled transactions table: %w", schErr)
 	}
 
 	return nil

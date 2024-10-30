@@ -26,6 +26,6 @@ WORKDIR /app
 
 COPY --from=build /app/asset-api .
 
-EXPOSE 8000
+EXPOSE 8001
 
 CMD ["./asset-api"]

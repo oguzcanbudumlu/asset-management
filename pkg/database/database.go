@@ -40,16 +40,13 @@ func NewDatabase(dbHost, dbPort, dbUser, dbPassword, dbName string) (*Database, 
 	return &Database{Conn: conn}, nil
 }
 
-func (db *Database) Close() {
+func (db *Database) Close() error {
 	sqlDB, err := db.Conn.DB()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to get database instance")
-		return
+		return err
 	}
 
-	if err := sqlDB.Close(); err != nil {
-		log.Error().Err(err).Msg("Failed to close the database connection")
-	} else {
-		log.Info().Msg("Database connection closed successfully")
-	}
+	log.Info().Msg("Closing database connection...")
+	return sqlDB.Close()
 }

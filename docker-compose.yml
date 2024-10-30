@@ -97,12 +97,13 @@ services:
       context: .
       dockerfile: services/transaction-consumer/Dockerfile
     environment:
-      DB_HOST: wallet-db
+      DB_HOST: asset-db
       DB_PORT: 5432
-      DB_USERNAME: wallet
-      DB_PASSWORD: wallet
-      DB_NAME: wallet
+      DB_USERNAME: asset
+      DB_PASSWORD: asset
+      DB_NAME: asset
       KAFKA_BROKER: kafka1:9092
+      KAFKA_TOPIC: test-topic
     depends_on:
       - kafka1
     networks:
@@ -113,12 +114,16 @@ services:
     build:
       context: .
       dockerfile: services/transaction-outbox-publisher/Dockerfile
+    ports:
+      - "8002:8002"
     environment:
       DB_HOST: asset-db
       DB_PORT: 5432
       DB_USERNAME: asset
       DB_PASSWORD: asset
       DB_NAME: asset
+      KAFKA_BROKER: kafka1:9092
+      KAFKA_TOPIC: test-topic
     depends_on:
       - asset-db
       - kafka1

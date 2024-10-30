@@ -29,5 +29,6 @@ func NewDatabaseRaw(host, port, user, password, dbname string) (*DatabaseRaw, er
 }
 
 func (d *DatabaseRaw) Close() error {
+	log.Info().Msg("Closing database connection...")
 	return d.Conn.Close()
 }

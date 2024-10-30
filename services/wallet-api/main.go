@@ -19,12 +19,15 @@ import (
 // @BasePath /
 func main() {
 	logger.InitLogger(zerolog.DebugLevel)
-	db, err := newDb()
+	db, err := database.NewDatabase(os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to initialize database")
 		return
 	}
-	defer db.Close()
 
 	appInstance := app.NewApp()
 
@@ -48,14 +51,8 @@ func main() {
 
 	log.Info().Msg("Wallet Service is running on port 8000")
 	appInstance.Start(":8000")
-}
 
-func newDb() (*database.Database, error) {
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USERNAME")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
-
-	return database.NewDatabase(dbHost, dbPort, dbUser, dbPassword, dbName)
+	if dbCloseErr := db.Close(); dbCloseErr != nil {
+		log.Error().Err(dbCloseErr).Msg("Failed to close database connection")
+	}
 }

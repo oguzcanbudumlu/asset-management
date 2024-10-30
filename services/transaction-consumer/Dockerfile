@@ -22,6 +22,6 @@ WORKDIR /app
 
 COPY --from=build /app/transaction-consumer .
 
-EXPOSE 8000
+EXPOSE 8003
 
 CMD ["./transaction-consumer"]

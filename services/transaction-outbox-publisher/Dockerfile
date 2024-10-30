@@ -8,8 +8,11 @@ ENV TZ=Europe/Istanbul
 
 COPY ../../go.mod ../../go.sum ./
 RUN go mod download
+RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 
-COPY ../../ .
+COPY ../.. .
+
+RUN swag init --dir ./services/transaction-outbox-publisher -o services/transaction-outbox-publisher/docs
 
 RUN go build -o transaction-outbox-publisher ./services/transaction-outbox-publisher
 
@@ -22,6 +25,6 @@ WORKDIR /app
 
 COPY --from=build /app/transaction-outbox-publisher .
 
-EXPOSE 8000
+EXPOSE 8002
 
 CMD ["./transaction-outbox-publisher"]
