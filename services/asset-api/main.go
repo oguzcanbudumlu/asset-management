@@ -92,8 +92,9 @@ func main() {
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)
 	appInstance.Fiber.Post("/transfer", transferC.Transfer)
-	appInstance.Fiber.Post("/schedule-transaction", scheduleTransferC.CreateScheduleTransaction)
-	appInstance.Fiber.Get("/schedule-transaction/next-minute", scheduleTransferC.GetNextMinuteTransactions)
+	appInstance.Fiber.Post("/scheduled-transaction", scheduleTransferC.CreateScheduleTransaction)
+	appInstance.Fiber.Get("/scheduled-transaction/next-minute", scheduleTransferC.GetNextMinuteTransactions)
+	appInstance.Fiber.Post("/scheduled-transaction/:id/process", scheduleTransferC.Process)
 
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")

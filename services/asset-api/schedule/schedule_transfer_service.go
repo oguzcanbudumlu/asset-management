@@ -3,12 +3,14 @@ package schedule
 import (
 	"asset-management/internal/common"
 	"errors"
+	"fmt"
 	"time"
 )
 
 type ScheduleTransactionService interface {
-	ScheduleTransaction(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error)
+	Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error)
 	GetNextMinuteTransactions() ([]ScheduleTransaction, error)
+	Process(scheduledTransactionID int64) error
 }
 
 type scheduleTransactionService struct {
@@ -21,7 +23,7 @@ func NewScheduleTransactionService(repo ScheduleTransactionRepository, wv common
 }
 
 // ScheduleTransaction creates a new schedule transaction.
-func (s *scheduleTransactionService) ScheduleTransaction(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error) {
+func (s *scheduleTransactionService) Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error) {
 	if err := s.walletValidator.ValidateBoth(fromWallet, toWallet, network); err != nil {
 		return 0, err
 	}
@@ -42,4 +44,13 @@ func (s *scheduleTransactionService) ScheduleTransaction(fromWallet, toWallet, n
 
 func (s *scheduleTransactionService) GetNextMinuteTransactions() ([]ScheduleTransaction, error) {
 	return s.repo.GetNextMinuteTransactions()
+}
+
+func (s *scheduleTransactionService) Process(scheduledTransactionID int64) error {
+	err := s.repo.Process(scheduledTransactionID)
+	if err != nil {
+		return fmt.Errorf("failed to process transaction: %w", err)
+	}
+
+	return nil
 }
