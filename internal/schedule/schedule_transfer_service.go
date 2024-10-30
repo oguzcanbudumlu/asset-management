@@ -25,7 +25,7 @@ package schedule
 //
 //// ScheduleTransaction creates a new schedule transaction.
 //func (s *scheduleTransactionService) Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error) {
-//	if err := s.walletValidator.ValidateBoth(fromWallet, toWallet, network); err != nil {
+//	if err := s.walletValidator.Both(fromWallet, toWallet, network); err != nil {
 //		return 0, err
 //	}
 //

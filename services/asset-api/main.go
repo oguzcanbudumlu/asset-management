@@ -1,7 +1,7 @@
 package main
 
 import (
-	"asset-management/internal/common"
+	"asset-management/internal/wallet"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
@@ -72,7 +72,7 @@ func main() {
 
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 
-	walletValidator := common.NewWalletValidationAdapter(os.Getenv("WALLET_API"))
+	walletValidator := wallet.NewValidationAdapter(os.Getenv("WALLET_API"))
 	depositR := deposit2.NewDepositRepository(db.Conn)
 	depositS := deposit2.NewDepositService(walletValidator, depositR)
 	depositC := deposit2.NewDepositController(depositS)

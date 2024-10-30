@@ -1,4 +1,4 @@
-package common
+package wallet
 
 import (
 	"errors"
@@ -7,20 +7,20 @@ import (
 	"net/http"
 )
 
-type WalletValidationAdapter interface {
-	ValidateWallet(walletAddress, network string) error
-	ValidateBoth(from, to, network string) error
+type ValidationAdapter interface {
+	One(walletAddress, network string) error
+	Both(from, to, network string) error
 }
 
 type walletValidationAdapter struct {
 	baseURL string
 }
 
-func NewWalletValidationAdapter(baseURL string) WalletValidationAdapter {
+func NewValidationAdapter(baseURL string) ValidationAdapter {
 	return &walletValidationAdapter{baseURL: baseURL}
 }
 
-func (a *walletValidationAdapter) ValidateWallet(walletAddress, network string) error {
+func (a *walletValidationAdapter) One(walletAddress, network string) error {
 	// Create the request URL
 	url := fmt.Sprintf("%s/wallet/%s/%s", a.baseURL, network, walletAddress)
 
@@ -39,18 +39,18 @@ func (a *walletValidationAdapter) ValidateWallet(walletAddress, network string) 
 	return nil
 }
 
-func (a *walletValidationAdapter) ValidateBoth(from, to, network string) error {
+func (a *walletValidationAdapter) Both(from, to, network string) error {
 	var g errgroup.Group
 
 	g.Go(func() error {
-		if err := a.ValidateWallet(from, network); err != nil {
+		if err := a.One(from, network); err != nil {
 			return errors.New("source wallet validation failed: " + err.Error())
 		}
 		return nil
 	})
 
 	g.Go(func() error {
-		if err := a.ValidateWallet(to, network); err != nil {
+		if err := a.One(to, network); err != nil {
 			return errors.New("destination wallet validation failed: " + err.Error())
 		}
 		return nil

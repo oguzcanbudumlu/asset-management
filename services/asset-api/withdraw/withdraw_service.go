@@ -1,21 +1,21 @@
 package withdraw
 
 import (
-	"asset-management/internal/common"
+	"asset-management/internal/wallet"
 	"errors"
 	"fmt"
 )
 
 type withdrawService struct {
 	withdrawRepository WithdrawRepository
-	walletValidator    common.WalletValidationAdapter
+	walletValidator    wallet.ValidationAdapter
 }
 
 type WithdrawService interface {
 	Withdraw(walletAddress, network string, amount float64) error
 }
 
-func NewWithdrawService(wr WithdrawRepository, va common.WalletValidationAdapter) WithdrawService {
+func NewWithdrawService(wr WithdrawRepository, va wallet.ValidationAdapter) WithdrawService {
 	return &withdrawService{withdrawRepository: wr, walletValidator: va}
 }
 
@@ -24,7 +24,7 @@ func (s *withdrawService) Withdraw(walletAddress, network string, amount float64
 		return errors.New("invalid input parameters")
 	}
 
-	err := s.walletValidator.ValidateWallet(walletAddress, network)
+	err := s.walletValidator.One(walletAddress, network)
 
 	if err != nil {
 		return fmt.Errorf("wallet validation failed: %w", err)

@@ -1,8 +1,8 @@
 package transaction
 
 import (
-	"asset-management/internal/common"
 	"asset-management/internal/schedule"
+	"asset-management/internal/wallet"
 	"errors"
 	"time"
 )
@@ -13,15 +13,15 @@ type CreateService interface {
 
 type createService struct {
 	repo            CreateRepository
-	walletValidator common.WalletValidationAdapter
+	walletValidator wallet.ValidationAdapter
 }
 
-func NewCreateService(repo CreateRepository, wv common.WalletValidationAdapter) CreateService {
+func NewCreateService(repo CreateRepository, wv wallet.ValidationAdapter) CreateService {
 	return &createService{repo: repo, walletValidator: wv}
 }
 
 func (s *createService) Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error) {
-	if err := s.walletValidator.ValidateBoth(fromWallet, toWallet, network); err != nil {
+	if err := s.walletValidator.Both(fromWallet, toWallet, network); err != nil {
 		return 0, err
 	}
 

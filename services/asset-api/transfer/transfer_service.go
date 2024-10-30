@@ -1,24 +1,24 @@
 package transfer
 
 import (
-	"asset-management/internal/common"
+	"asset-management/internal/wallet"
 )
 
 type transferService struct {
 	transferRepository TransferRepository
-	walletValidator    common.WalletValidationAdapter
+	walletValidator    wallet.ValidationAdapter
 }
 
 type TransferService interface {
 	Transfer(from, to, network string, amount float64) error
 }
 
-func NewTransferService(tr TransferRepository, wv common.WalletValidationAdapter) TransferService {
+func NewTransferService(tr TransferRepository, wv wallet.ValidationAdapter) TransferService {
 	return &transferService{transferRepository: tr, walletValidator: wv}
 }
 
 func (s *transferService) Transfer(from, to, network string, amount float64) error {
-	if err := s.walletValidator.ValidateBoth(from, to, network); err != nil {
+	if err := s.walletValidator.Both(from, to, network); err != nil {
 		return err
 	}
 
