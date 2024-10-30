@@ -2,7 +2,7 @@ package transaction
 
 import (
 	"asset-management/internal/schedule"
-	"asset-management/internal/wallet"
+	"asset-management/services/asset-api/wallet"
 	"errors"
 	"time"
 )

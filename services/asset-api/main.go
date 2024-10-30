@@ -1,7 +1,6 @@
 package main
 
 import (
-	"asset-management/internal/wallet"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
@@ -9,6 +8,7 @@ import (
 	_ "asset-management/services/asset-api/docs"
 	"asset-management/services/asset-api/transaction"
 	"asset-management/services/asset-api/transfer"
+	"asset-management/services/asset-api/wallet"
 	"asset-management/services/asset-api/withdraw"
 	"database/sql"
 	"fmt"

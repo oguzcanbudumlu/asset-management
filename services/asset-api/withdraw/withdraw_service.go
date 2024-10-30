@@ -1,7 +1,7 @@
 package withdraw
 
 import (
-	"asset-management/internal/wallet"
+	"asset-management/services/asset-api/wallet"
 	"errors"
 	"fmt"
 )

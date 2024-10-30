@@ -1,7 +1,7 @@
 package transfer
 
 import (
-	"asset-management/internal/wallet"
+	"asset-management/services/asset-api/wallet"
 )
 
 type transferService struct {
