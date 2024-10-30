@@ -3,11 +3,13 @@ package common
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
 type WalletValidationAdapter interface {
 	ValidateWallet(walletAddress, network string) error
+	ValidateBoth(from, to, network string) error
 }
 
 type walletValidationAdapter struct {
@@ -35,4 +37,24 @@ func (a *walletValidationAdapter) ValidateWallet(walletAddress, network string) 
 	}
 
 	return nil
+}
+
+func (a *walletValidationAdapter) ValidateBoth(from, to, network string) error {
+	var g errgroup.Group
+
+	g.Go(func() error {
+		if err := a.ValidateWallet(from, network); err != nil {
+			return errors.New("source wallet validation failed: " + err.Error())
+		}
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := a.ValidateWallet(to, network); err != nil {
+			return errors.New("destination wallet validation failed: " + err.Error())
+		}
+		return nil
+	})
+
+	return g.Wait()
 }

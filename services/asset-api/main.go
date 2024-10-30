@@ -7,6 +7,7 @@ import (
 	"asset-management/pkg/logger"
 	deposit2 "asset-management/services/asset-api/deposit"
 	_ "asset-management/services/asset-api/docs"
+	"asset-management/services/asset-api/schedule"
 	"asset-management/services/asset-api/transfer"
 	"asset-management/services/asset-api/withdraw"
 	"database/sql"
@@ -84,9 +85,14 @@ func main() {
 	transferS := transfer.NewTransferService(transferR, walletValidator)
 	transferC := transfer.NewDepositController(transferS)
 
+	scheduleTransferR := schedule.NewScheduleTransactionRepository(db.Conn)
+	scheduleTransferS := schedule.NewScheduleTransactionService(scheduleTransferR, walletValidator)
+	scheduleTransferC := schedule.NewScheduleTransactionController(scheduleTransferS)
+
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)
 	appInstance.Fiber.Post("/transfer", transferC.Transfer)
+	appInstance.Fiber.Post("/schedule-transaction", scheduleTransferC.CreateScheduleTransaction)
 
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")
