@@ -6,11 +6,13 @@ import (
 	"asset-management/pkg/database"
 	"asset-management/pkg/kafka"
 	"asset-management/pkg/logger"
+	_ "asset-management/services/transaction-outbox-publisher/docs"
 	"asset-management/services/transaction-outbox-publisher/publisher"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
+
 	"os"
 )
 

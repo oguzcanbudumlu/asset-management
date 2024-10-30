@@ -1,7 +1,6 @@
 package publisher
 
 import (
-	_ "asset-management/services/transaction-outbox-publisher/docs"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
