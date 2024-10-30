@@ -65,3 +65,8 @@ graph TD
     %% Scheduler-Asset Interaction
     SchedulerService -->|Scheduled Deposit/Withdraw| MessageQueue
 ```
+
+- TODO
+- transaction-outbox-publisher (outbox)
+- big decimal (numeric 30,10)
+- test (testcontainer, unit, integration(mock, controller test), e2e(testcontainer, wiremock))

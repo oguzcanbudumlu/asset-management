@@ -18,7 +18,7 @@ func NewCreateRepository(db *sql.DB) CreateRepository {
 	return &postgresCreateRepository{db: db}
 }
 
-// Create inserts a new schedule transaction into the database.
+// Create inserts a new scheduled transaction into the database.
 func (r *postgresCreateRepository) Create(tx *schedule.ScheduleTransaction) (int, error) {
 	query := `
 		INSERT INTO scheduled_transactions (from_wallet_address, to_wallet_address, network, amount, scheduled_time, status)
@@ -27,7 +27,7 @@ func (r *postgresCreateRepository) Create(tx *schedule.ScheduleTransaction) (int
 	var id int
 	err := r.db.QueryRow(query, tx.FromWallet, tx.ToWallet, tx.Network, tx.Amount, tx.ScheduledTime, tx.Status).Scan(&id)
 	if err != nil {
-		return 0, fmt.Errorf("failed to insert schedule transaction: %v", err)
+		return 0, fmt.Errorf("failed to insert scheduled transaction: %v", err)
 	}
 	return id, nil
 }

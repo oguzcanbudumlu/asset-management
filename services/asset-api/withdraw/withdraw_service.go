@@ -4,6 +4,7 @@ import (
 	"asset-management/services/asset-api/wallet"
 	"errors"
 	"fmt"
+	"github.com/shopspring/decimal"
 )
 
 type withdrawService struct {
@@ -12,28 +13,29 @@ type withdrawService struct {
 }
 
 type WithdrawService interface {
-	Withdraw(walletAddress, network string, amount float64) error
+	Withdraw(walletAddress, network string, amount decimal.Decimal) (decimal.Decimal, error)
 }
 
 func NewWithdrawService(wr WithdrawRepository, va wallet.ValidationAdapter) WithdrawService {
 	return &withdrawService{withdrawRepository: wr, walletValidator: va}
 }
 
-func (s *withdrawService) Withdraw(walletAddress, network string, amount float64) error {
-	if walletAddress == "" || network == "" || amount <= 0 {
-		return errors.New("invalid input parameters")
+func (s *withdrawService) Withdraw(walletAddress, network string, amount decimal.Decimal) (decimal.Decimal, error) {
+	if walletAddress == "" || network == "" || amount.LessThanOrEqual(decimal.Zero) {
+		return decimal.Zero, errors.New("invalid input parameters")
 	}
 
+	// Validate the wallet
 	err := s.walletValidator.One(walletAddress, network)
-
 	if err != nil {
-		return fmt.Errorf("wallet validation failed: %w", err)
+		return decimal.Zero, fmt.Errorf("wallet validation failed: %w", err)
 	}
 
-	repoErr := s.withdrawRepository.Withdraw(walletAddress, network, amount)
+	// Perform the withdrawal
+	newBalance, repoErr := s.withdrawRepository.Withdraw(walletAddress, network, amount)
 	if repoErr != nil {
-		return fmt.Errorf("withdraw transaction failed: %w", err)
+		return decimal.Zero, fmt.Errorf("withdraw transaction failed: %w", repoErr)
 	}
 
-	return nil
+	return newBalance, nil
 }

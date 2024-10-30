@@ -3,6 +3,7 @@ package transfer
 import (
 	"asset-management/services/asset-api/common/dto"
 	"github.com/gofiber/fiber/v2"
+	"github.com/shopspring/decimal"
 )
 
 type TransferController interface {
@@ -13,8 +14,15 @@ type transferController struct {
 	service TransferService
 }
 
-func NewDepositController(service TransferService) TransferController {
+func NewTransferController(service TransferService) TransferController {
 	return &transferController{service: service}
+}
+
+type TransferRequest struct {
+	From    string          `json:"from" example:"0x123abc456def"`
+	To      string          `json:"to" example:"0x987def456def"`
+	Network string          `json:"network" example:"Ethereum"`
+	Amount  decimal.Decimal `json:"amount" example:"100.50"`
 }
 
 // Transfer godoc

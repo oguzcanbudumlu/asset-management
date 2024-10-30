@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/shopspring/decimal"
 )
 
 type ProcessRepository interface {
@@ -27,7 +28,7 @@ func (r *postgresProcessRepository) Process(scheduledTransactionID int64) error 
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
 
-	// Ensure rollback in case of error
+	// Define rollback function
 	rollback := func() {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			fmt.Printf("transaction rollback failed: %v\n", rollbackErr)
@@ -36,7 +37,7 @@ func (r *postgresProcessRepository) Process(scheduledTransactionID int64) error 
 
 	// Retrieve scheduled transaction details
 	var fromWallet, toWallet, network string
-	var amount float64
+	var amount decimal.Decimal
 
 	err = tx.QueryRowContext(ctx, `
         SELECT from_wallet_address, to_wallet_address, network, amount 

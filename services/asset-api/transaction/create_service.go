@@ -4,11 +4,12 @@ import (
 	"asset-management/internal/schedule"
 	"asset-management/services/asset-api/wallet"
 	"errors"
+	"github.com/shopspring/decimal"
 	"time"
 )
 
 type CreateService interface {
-	Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error)
+	Create(fromWallet, toWallet, network string, amount decimal.Decimal, scheduledTime time.Time) (int, error)
 }
 
 type createService struct {
@@ -20,12 +21,12 @@ func NewCreateService(repo CreateRepository, wv wallet.ValidationAdapter) Create
 	return &createService{repo: repo, walletValidator: wv}
 }
 
-func (s *createService) Create(fromWallet, toWallet, network string, amount float64, scheduledTime time.Time) (int, error) {
+func (s *createService) Create(fromWallet, toWallet, network string, amount decimal.Decimal, scheduledTime time.Time) (int, error) {
 	if err := s.walletValidator.Both(fromWallet, toWallet, network); err != nil {
 		return 0, err
 	}
 
-	if amount <= 0 {
+	if amount.LessThanOrEqual(decimal.Zero) {
 		return 0, errors.New("amount must be greater than zero")
 	}
 	tx := &schedule.ScheduleTransaction{
