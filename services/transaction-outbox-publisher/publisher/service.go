@@ -3,6 +3,13 @@ package publisher
 import (
 	"asset-management/internal/schedule"
 	"asset-management/pkg/kafka"
+	"context"
+	"encoding/json"
+	"github.com/rs/zerolog/log"
+	kafka2 "github.com/segmentio/kafka-go"
+	"github.com/shopspring/decimal"
+	"os"
+	"time"
 )
 
 type service struct {
@@ -22,30 +29,77 @@ func NewService(nextService schedule.NextService, producer *kafka.Producer) Serv
 }
 
 func (s *service) TriggerPublisher() (int, error) {
-	//transactions, err := s.nextService.GetNextMinuteTransactions()
-	return 0, nil
-	//if err != nil {
-	//	return 0, fmt.Errorf("failed to retrieve transactions: %v", err)
-	//}
-	//
-	//// Map transactions to events for Kafka production
-	//events := MapScheduleTransactionsToEvents(transactions)
-	//
-	//for _, event := range events {
-	//	key, value := MapScheduleTransactionsToEvents(event) // Assume MapScheduleTransactionToKeyValue exists
-	//	keyBytes, _ := json.Marshal(key)
-	//	valueBytes, _ := json.Marshal(value)
-	//
-	//	messages = append(messages, kafka.Message{
-	//		Key:   keyBytes,
-	//		Value: valueBytes,
-	//	})
-	//}
-	//
-	//// Produce the events to Kafka
-	//if err := s.producer.ProduceMessages(messages); err != nil {
-	//	return 0, fmt.Errorf("failed to produce messages to Kafka: %v", err)
-	//}
-	//
-	//return len(messages), nil
+	// Retrieve the topic from environment variables once.
+	topic := os.Getenv("KAFKA_TOPIC")
+
+	// Simulate getting transactions from nextService (replace with actual call if needed).
+	transactions, err := s.nextService.GetNextMinuteTransactions()
+
+	if err != nil {
+		return 0, err
+	}
+
+	var messages []kafka2.Message
+
+	// Serialize each transaction to JSON and prepare the Kafka messages.
+	for _, transaction := range transactions {
+		message, err := json.Marshal(transaction)
+		if err != nil {
+			log.Error().
+				Int("transaction_id", transaction.ID).
+				Err(err).
+				Msg("Error serializing transaction")
+			continue
+		}
+
+		// Append the serialized transaction as a Kafka message to the slice.
+		messages = append(messages, kafka2.Message{
+			Key:   []byte(transaction.FromWallet), // Using FromWallet as the message key
+			Value: message,
+			Time:  time.Now(),
+		})
+	}
+
+	// Send all messages in bulk to Kafka.
+	writeErr := s.producer.Writer.WriteMessages(context.Background(), messages...)
+	if writeErr != nil {
+		log.Error().
+			Err(writeErr).
+			Int("message_count", len(messages)).
+			Str("topic", topic).
+			Msg("Error writing messages to Kafka")
+		return 0, writeErr
+	}
+
+	log.Info().
+		Int("message_count", len(messages)).
+		Str("topic", topic).
+		Msg("Successfully sent transactions to Kafka")
+
+	return len(messages), nil
+}
+
+func mockTransactions() []schedule.ScheduleTransaction {
+	return []schedule.ScheduleTransaction{
+		{
+			ID:            1,
+			FromWallet:    "wallet_ABC123",
+			ToWallet:      "wallet_XYZ789",
+			Network:       "Ethereum",
+			Amount:        decimal.NewFromFloat(250.75),
+			ScheduledTime: time.Date(2024, 10, 31, 15, 0, 0, 0, time.UTC),
+			Status:        "PENDING",
+			CreatedAt:     time.Date(2024, 10, 29, 10, 15, 0, 0, time.UTC),
+		},
+		{
+			ID:            2,
+			FromWallet:    "wallet_DEF456",
+			ToWallet:      "wallet_UVW123",
+			Network:       "Bitcoin",
+			Amount:        decimal.NewFromFloat(500.00),
+			ScheduledTime: time.Date(2024, 11, 1, 12, 0, 0, 0, time.UTC),
+			Status:        "PENDING",
+			CreatedAt:     time.Date(2024, 10, 30, 11, 30, 0, 0, time.UTC),
+		},
+	}
 }

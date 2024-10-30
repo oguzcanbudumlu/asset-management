@@ -7,7 +7,7 @@ import (
 )
 
 type Producer struct {
-	writer *kafka.Writer
+	Writer *kafka.Writer
 }
 
 func NewProducer(brokerAddress, topic string) *Producer {
@@ -17,12 +17,12 @@ func NewProducer(brokerAddress, topic string) *Producer {
 		Balancer:  &kafka.LeastBytes{},
 		Transport: &kafka.Transport{ClientID: "json-producer", DialTimeout: 10 * time.Second},
 	}
-	return &Producer{writer: writer}
+	return &Producer{Writer: writer}
 }
 
-// Close shuts down the Kafka writer connection
+// Close shuts down the Kafka Writer connection
 func (p *Producer) Close() error {
-	if err := p.writer.Close(); err != nil {
+	if err := p.Writer.Close(); err != nil {
 		log.Error().Err(err).Msg("Failed to close Kafka producer")
 		return err
 	}
