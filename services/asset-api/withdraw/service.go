@@ -6,20 +6,20 @@ import (
 	"fmt"
 )
 
-type withdrawService struct {
-	withdrawRepository WithdrawRepository
+type service struct {
+	withdrawRepository Repository
 	walletValidator    wallet.ValidationAdapter
 }
 
-type WithdrawService interface {
+type Service interface {
 	Withdraw(walletAddress, network string, amount float64) error
 }
 
-func NewWithdrawService(wr WithdrawRepository, va wallet.ValidationAdapter) WithdrawService {
-	return &withdrawService{withdrawRepository: wr, walletValidator: va}
+func NewService(wr Repository, va wallet.ValidationAdapter) Service {
+	return &service{withdrawRepository: wr, walletValidator: va}
 }
 
-func (s *withdrawService) Withdraw(walletAddress, network string, amount float64) error {
+func (s *service) Withdraw(walletAddress, network string, amount float64) error {
 	if walletAddress == "" || network == "" || amount <= 0 {
 		return errors.New("invalid input parameters")
 	}

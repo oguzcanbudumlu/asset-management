@@ -59,9 +59,9 @@ func main() {
 	depositS := deposit2.NewService(walletValidator, depositR)
 	depositC := deposit2.NewController(depositS)
 
-	withdrawR := withdraw.NewWithdrawRepository(db.Conn)
-	withdrawS := withdraw.NewWithdrawService(withdrawR, walletValidator)
-	withdrawC := withdraw.NewWithdrawController(withdrawS)
+	withdrawR := withdraw.NewRepository(db.Conn)
+	withdrawS := withdraw.NewService(withdrawR, walletValidator)
+	withdrawC := withdraw.NewController(withdrawS)
 
 	transferR := transfer.NewTransferRepository(db.Conn)
 	transferS := transfer.NewTransferService(transferR, walletValidator)

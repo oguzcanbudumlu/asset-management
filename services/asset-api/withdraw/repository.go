@@ -5,19 +5,19 @@ import (
 	"errors"
 )
 
-type WithdrawRepository interface {
+type Repository interface {
 	Withdraw(walletAddress, network string, amount float64) error
 }
 
-type withdrawRepository struct {
+type repository struct {
 	db *sql.DB
 }
 
-func NewWithdrawRepository(db *sql.DB) WithdrawRepository {
-	return &withdrawRepository{db: db}
+func NewRepository(db *sql.DB) Repository {
+	return &repository{db: db}
 }
 
-func (r *withdrawRepository) Withdraw(walletAddress, network string, amount float64) error {
+func (r *repository) Withdraw(walletAddress, network string, amount float64) error {
 	var currentBalance float64
 
 	// Start a transaction

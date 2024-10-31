@@ -5,27 +5,27 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// WithdrawRequest represents the request payload for a withdrawal
-type WithdrawRequest struct {
+// Request represents the request payload for a withdrawal
+type Request struct {
 	WalletAddress string  `json:"wallet_address" example:"0x123abc456def"`
 	Network       string  `json:"network" example:"Ethereum"`
 	Amount        float64 `json:"amount" example:"100.50"`
 }
 
-// WithdrawResponse represents the response payload after a successful withdrawal
-type WithdrawResponse struct {
+// Response represents the response payload after a successful withdrawal
+type Response struct {
 	NewBalance float64 `json:"new_balance" example:"1500.75"`
 }
-type WithdrawController interface {
+type Controller interface {
 	Withdraw(ctx *fiber.Ctx) error
 }
 
-type withdrawController struct {
-	service WithdrawService
+type controller struct {
+	service Service
 }
 
-func NewWithdrawController(service WithdrawService) WithdrawController {
-	return &withdrawController{service: service}
+func NewController(service Service) Controller {
+	return &controller{service: service}
 }
 
 // Withdraw godoc
@@ -34,12 +34,12 @@ func NewWithdrawController(service WithdrawService) WithdrawController {
 // @Tags         withdraw
 // @Accept       json
 // @Produce      json
-// @Param        depositRequest body WithdrawRequest true "Withdraw request payload"
+// @Param        depositRequest body Request true "Withdraw request payload"
 // @Success      200  "Withdraw operation successful"
 // @Failure      400  {object}  dto.ErrorResponse
 // @Router       /withdraw [post]
-func (c *withdrawController) Withdraw(ctx *fiber.Ctx) error {
-	var req WithdrawRequest
+func (c *controller) Withdraw(ctx *fiber.Ctx) error {
+	var req Request
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ErrorResponse{Message: "Invalid request payload"})
 	}

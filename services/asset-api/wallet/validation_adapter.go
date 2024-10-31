@@ -21,17 +21,14 @@ func NewValidationAdapter(baseURL string) ValidationAdapter {
 }
 
 func (a *walletValidationAdapter) One(walletAddress, network string) error {
-	// Create the request URL
 	url := fmt.Sprintf("%s/wallet/%s/%s", a.baseURL, network, walletAddress)
 
-	// Make the HTTP GET request
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	// Check if the status code is 200 OK
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("failed to validate wallet")
 	}
