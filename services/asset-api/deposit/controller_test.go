@@ -15,15 +15,15 @@ import (
 )
 
 // Mock service
-type mockDepositService struct{ mock.Mock }
+type mockService struct{ mock.Mock }
 
-func (m *mockDepositService) Deposit(walletAddress, network string, amount float64) (float64, error) {
+func (m *mockService) Deposit(walletAddress, network string, amount float64) (float64, error) {
 	args := m.Called(walletAddress, network, amount)
 	return args.Get(0).(float64), args.Error(1)
 }
 
 func TestDepositController_Success(t *testing.T) {
-	service := new(mockDepositService)
+	service := new(mockService)
 	service.On("Deposit", "0x123abc456def", "Ethereum", 100.50).Return(1500.75, nil)
 
 	controller := deposit.NewController(service)
@@ -41,7 +41,7 @@ func TestDepositController_Success(t *testing.T) {
 }
 
 func TestDepositController_InvalidPayload(t *testing.T) {
-	service := new(mockDepositService)
+	service := new(mockService)
 	controller := deposit.NewController(service)
 
 	app := fiber.New()
@@ -55,7 +55,7 @@ func TestDepositController_InvalidPayload(t *testing.T) {
 }
 
 func TestDepositController_ServiceError(t *testing.T) {
-	service := new(mockDepositService)
+	service := new(mockService)
 	service.On("Deposit", "0x123abc456def", "Ethereum", 100.50).Return(0.0, errors.New("deposit error"))
 
 	controller := deposit.NewController(service)

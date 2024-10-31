@@ -23,12 +23,12 @@ func NewController(service Service) Controller {
 // @Tags         deposit
 // @Accept       json
 // @Produce      json
-// @Param        depositRequest body DepositRequest true "Deposit request payload"
-// @Success      200  {object}  DepositResponse
+// @Param        depositRequest body Request true "Deposit request payload"
+// @Success      200  {object}  Response
 // @Failure      400  {object}  dto.ErrorResponse
 // @Router       /deposit [post]
 func (c *controller) Deposit(ctx *fiber.Ctx) error {
-	var req DepositRequest
+	var req Request
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ErrorResponse{Message: "Invalid request payload"})
 	}
@@ -38,5 +38,5 @@ func (c *controller) Deposit(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ErrorResponse{Message: err.Error()})
 	}
 
-	return ctx.JSON(DepositResponse{NewBalance: newBalance})
+	return ctx.JSON(Response{NewBalance: newBalance})
 }
