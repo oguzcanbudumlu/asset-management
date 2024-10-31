@@ -166,7 +166,136 @@ asset-management
 }
 ```
 
+# Project Setup
+
+This project includes several microservices managed with Docker Compose. Follow the steps below to set up and run the project locally.
+
+## Prerequisites
+
+- **Docker**: Ensure you have Docker installed on your system.
+- **Docker Compose**: Confirm Docker Compose is installed, as it’s used to orchestrate the containers.
+
+## Services Overview
+
+The project consists of the following services:
+
+1. **Zookeeper**: Manages configuration and synchronization for Kafka.
+2. **Kafka**: Provides messaging functionality, including a test topic for communication.
+3. **Kafka UI**: A UI for monitoring Kafka topics and messages.
+4. **Asset API**: Manages asset operations and interacts with the `wallet-api` for validation.
+5. **Wallet API**: Manages wallet creation and deletion.
+6. **Transaction Consumer**: Listens to Kafka topics, processes transactions, and updates balances.
+7. **Transaction Outbox Publisher**: Periodically publishes events to Kafka based on a configured schedule.
+8. **Databases**:
+   - `wallet-db`: PostgreSQL database for wallet information.
+   - `asset-db`: PostgreSQL database for asset data.
+
+## Setup and Run
+
+1. **Start Services**: Run the following command to start all services in the background.
+
+   ```bash
+   make up
+   ```
+
+2. **Stop Services**: To stop all services, use:
+
+   ```bash
+   make down
+   ```
+
+3. **Restart Services**: If you need to restart all services:
+
+   ```bash
+   make restart
+   ```
+
+4. **Build Services**: To build the images without starting the containers:
+
+   ```bash
+   make build
+   ```
+
+5. **View Logs**: To monitor logs for all services, run:
+
+   ```bash
+   make logs
+   ```
+
+6. **View Logs for a Specific Service**: To monitor logs for individual services, run the following commands:
+
+   1. **Zookeeper**: To view logs for the Zookeeper service, run:
+
+       ```bash
+       make logs | grep zookeeper
+       ```
+
+   2. **Kafka Broker (kafka1)**: To view logs for the Kafka broker (kafka1), run:
+
+       ```bash
+       make logs | grep kafka1
+       ```
+
+   3. **Kafka UI**: To view logs for the Kafka UI service, run:
+
+       ```bash
+       make logs | grep kafka-ui
+       ```
+
+   4. **Asset API**: To view logs for the Asset API service, run:
+
+       ```bash
+       make logs | grep asset-api
+       ```
+
+   5. **Wallet API**: To view logs for the Wallet API service, run:
+
+       ```bash
+       make logs | grep wallet-api
+       ```
+
+   6. **Transaction Consumer**: To view logs for the Transaction Consumer service, run:
+
+       ```bash
+       make logs | grep transaction-consumer
+       ```
+
+   7. **Transaction Outbox Publisher**: To view logs for the Transaction Outbox Publisher service, run:
+
+       ```bash
+       make logs | grep transaction-outbox-publisher
+       ```
+
+   8. **Wallet Database (PostgreSQL)**: To view logs for the Wallet Database service, run:
+
+       ```bash
+       make logs | grep wallet-db
+       ```
+
+   9. **Asset Database (PostgreSQL)**: To view logs for the Asset Database service, run:
+
+       ```bash
+       make logs | grep asset-db
+       ```
+
+7. **Rebuild Services**: For a fresh build and restart, use:
+
+   ```bash
+   make rebuild
+   ```
+
+8. **Clean Up**: To remove all volumes and orphaned containers, use:
+
+   ```bash
+   make delete
+   ```
+
+## Accessing Services
+
+- **[Kafka UI](http://localhost:8080)**: Access the Kafka UI.
+- **[Asset API](http://localhost:8001)**: Accessible on `http://localhost:8001`.
+- **[Wallet API](http://localhost:8000)**: Accessible on `http://localhost:8000`.
+- **[Transaction Outbox Publisher](http://localhost:8002)**: Accessible on `http://localhost:8002`.
+
 
 - [ ] Endpoints
-- [ ] Decimal
-- [ ] how to set up
