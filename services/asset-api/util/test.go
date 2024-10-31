@@ -54,7 +54,7 @@ func SetupTestContainer(t *testing.T) (*sql.DB, func()) {
 	_, err = db.Exec(sql2.CreateBalanceTableSQL)
 	assert.NoError(t, err)
 
-	_, err = db.Exec(sql2.CreateBalanceTableSQL)
+	_, err = db.Exec(sql2.CreateScheduledTransactionsTable)
 	assert.NoError(t, err)
 
 	// Cleanup function to terminate the container
