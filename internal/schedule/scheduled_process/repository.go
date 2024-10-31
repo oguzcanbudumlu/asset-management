@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/shopspring/decimal"
 )
 
 type ProcessRepository interface {
@@ -37,7 +36,7 @@ func (r *postgresProcessRepository) Process(scheduledTransactionID int) error {
 
 	// Retrieve scheduled transaction details
 	var fromWallet, toWallet, network string
-	var amount decimal.Decimal
+	var amount float64
 
 	err = tx.QueryRowContext(ctx, `
         SELECT from_wallet_address, to_wallet_address, network, amount 
