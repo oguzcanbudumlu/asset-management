@@ -50,6 +50,13 @@ func main() {
 
 	appInstance.Fiber.Post("/trigger-publisher", c.TriggerPublisher)
 
+	cronJob := publisher.NewJob(s)
+	if cronErr := cronJob.Start(); cronErr != nil {
+		log.Error().Err(cronErr).Msg("Failed to start cron job")
+		return
+	}
+	defer cronJob.Stop()
+
 	appInstance.Start(":8002")
 	if dbCloseErr := db.Close(); dbCloseErr != nil {
 		log.Error().Err(dbCloseErr).Msg("Failed to close database connection")
