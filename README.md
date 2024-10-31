@@ -97,20 +97,25 @@ graph TD
 asset-management
 ├── internal
 ├── pkg
-└── services
-    ├── asset-api
-    │   └── main.go
-    ├── transaction-consumer
-    │   └── main.go
-    ├── transaction-outbox-publisher
-    │   └── main.go
-    └── wallet-api
-        └── main.go
-
+├── services
+│   ├── asset-api
+│   │   ├── main.go
+│   │   └── Dockerfile
+│   ├── transaction-consumer
+│   │   ├── main.go
+│   │   └── Dockerfile
+│   ├── transaction-outbox-publisher
+│   │   ├── main.go
+│   │   └── Dockerfile
+│   └── wallet-api
+│       ├── main.go
+│       └── Dockerfile
+├── Makefile
+└── docker-compose.yml
 ```
 
 
-> The `main.go` files above serve as the entry points for each microservice.
+> Each microservice has its entry point defined by `main.go`, with a `Dockerfile` located alongside each entry point to containerize the service. The `docker-compose.yml` file orchestrates these Docker images, enabling the microservices to work together seamlessly. Additionally, the `Makefile` is provided to simplify this orchestration, making it easier to manage and run the entire setup.
 
 
 
@@ -161,3 +166,7 @@ asset-management
 }
 ```
 
+
+- [ ] Endpoints
+- [ ] Decimal
+- [ ] how to set up
