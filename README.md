@@ -91,6 +91,30 @@ graph TD
     - Listens to the Kafka topic for transaction events.
     - Processes each event by transferring funds in the `balance` table and updating the transaction status from "PENDING" to "COMPLETED" in the `scheduled_transactions` table.
 
+
+
+```
+asset-management
+├── internal
+├── pkg
+└── services
+    ├── asset-api
+    │   └── main.go
+    ├── transaction-consumer
+    │   └── main.go
+    ├── transaction-outbox-publisher
+    │   └── main.go
+    └── wallet-api
+        └── main.go
+
+```
+
+
+> The `main.go` files above serve as the entry points for each microservice.
+
+
+
+
 ## Database Table Entry Examples
 
 > **Note:** In this schema, `network` is used in place of `name` to represent the network associated with each wallet or transaction.
