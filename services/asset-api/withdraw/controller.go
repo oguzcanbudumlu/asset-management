@@ -5,14 +5,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Request represents the request payload for a withdrawal
 type Request struct {
 	WalletAddress string  `json:"wallet_address" example:"0x123abc456def"`
 	Network       string  `json:"network" example:"Ethereum"`
 	Amount        float64 `json:"amount" example:"100.50"`
 }
 
-// Response represents the response payload after a successful withdrawal
 type Response struct {
 	NewBalance float64 `json:"new_balance" example:"1500.75"`
 }
