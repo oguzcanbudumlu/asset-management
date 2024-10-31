@@ -1,16 +1,17 @@
-package scheduled_process
+package scheduled
 
 import (
+	"asset-management/internal/schedule/scheduled_process"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
 
 type ProcessController struct {
-	service ProcessService
+	service scheduled_process.ProcessService
 }
 
-func NewProcessController(service ProcessService) *ProcessController {
+func NewProcessController(service scheduled_process.ProcessService) *ProcessController {
 	return &ProcessController{service: service}
 }
 

@@ -1,7 +1,7 @@
 package e2e_test
 
 import (
-	"asset-management/services/asset-api/transaction"
+	"asset-management/services/asset-api/scheduled"
 	"asset-management/services/asset-api/util"
 	"bytes"
 	"encoding/json"
@@ -19,10 +19,10 @@ func setupE2EApp(t *testing.T) (*fiber.App, func(), *MockValidationAdapter) {
 	db, cleanup := util.SetupTestContainer(t)
 
 	// Create repository, mock validation adapter, and service
-	repo := transaction.NewCreateRepository(db)
+	repo := scheduled.NewCreateRepository(db)
 	mockValidator := new(MockValidationAdapter)
-	service := transaction.NewCreateService(repo, mockValidator)
-	controller := transaction.NewCreateController(service)
+	service := scheduled.NewCreateService(repo, mockValidator)
+	controller := scheduled.NewCreateController(service)
 
 	// Setup Fiber app with the transaction route
 	app := fiber.New()
@@ -39,7 +39,7 @@ func TestE2E_CreateTransaction_Success(t *testing.T) {
 	mockValidator.On("Both", "wallet123", "wallet456", "mainnet").Return(nil)
 
 	// Define valid transaction request payload
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",
@@ -71,7 +71,7 @@ func TestE2E_CreateTransaction_InvalidAmount(t *testing.T) {
 	defer cleanup()
 
 	// Define transaction request payload with an invalid amount
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",
@@ -99,7 +99,7 @@ func TestE2E_CreateTransaction_InvalidScheduledTimeFormat(t *testing.T) {
 	defer cleanup()
 
 	// Define transaction request payload with an invalid scheduled time format
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",
@@ -130,7 +130,7 @@ func TestE2E_CreateTransaction_ValidationFailed(t *testing.T) {
 	mockValidator.On("Both", "wallet123", "wallet456", "mainnet").Return(errors.New("wallet validation failed"))
 
 	// Define transaction request payload
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",

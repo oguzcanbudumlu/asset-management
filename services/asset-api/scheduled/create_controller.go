@@ -1,4 +1,4 @@
-package transaction
+package scheduled
 
 import (
 	"github.com/gofiber/fiber/v2"

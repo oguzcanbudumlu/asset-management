@@ -1,7 +1,7 @@
-package scheduled_process_test
+package scheduled_test
 
 import (
-	"asset-management/internal/schedule/scheduled_process"
+	"asset-management/services/asset-api/scheduled"
 	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
@@ -23,7 +23,7 @@ func (m *MockProcessService) Process(scheduledTransactionID int) error {
 
 func TestProcessController_Process_Success(t *testing.T) {
 	mockService := new(MockProcessService)
-	controller := scheduled_process.NewProcessController(mockService)
+	controller := scheduled.NewProcessController(mockService)
 
 	app := fiber.New()
 	app.Post("/scheduled-transaction/:id/process", controller.Process)
@@ -48,7 +48,7 @@ func TestProcessController_Process_Success(t *testing.T) {
 
 func TestProcessController_Process_InvalidID(t *testing.T) {
 	mockService := new(MockProcessService)
-	controller := scheduled_process.NewProcessController(mockService)
+	controller := scheduled.NewProcessController(mockService)
 
 	app := fiber.New()
 	app.Post("/scheduled-transaction/:id/process", controller.Process)
@@ -68,7 +68,7 @@ func TestProcessController_Process_InvalidID(t *testing.T) {
 
 func TestProcessController_Process_Failure(t *testing.T) {
 	mockService := new(MockProcessService)
-	controller := scheduled_process.NewProcessController(mockService)
+	controller := scheduled.NewProcessController(mockService)
 
 	app := fiber.New()
 	app.Post("/scheduled-transaction/:id/process", controller.Process)

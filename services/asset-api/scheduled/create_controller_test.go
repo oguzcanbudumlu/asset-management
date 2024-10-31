@@ -1,7 +1,7 @@
-package transaction_test
+package scheduled_test
 
 import (
-	"asset-management/services/asset-api/transaction"
+	"asset-management/services/asset-api/scheduled"
 	"bytes"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
@@ -24,11 +24,11 @@ func (m *MockCreateService) Create(fromWallet, toWallet, network string, amount 
 
 func TestCreateController_Success(t *testing.T) {
 	mockService := new(MockCreateService)
-	controller := transaction.NewCreateController(mockService)
+	controller := scheduled.NewCreateController(mockService)
 	app := fiber.New()
 	app.Post("/scheduled-transaction", controller.Create)
 
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",
@@ -54,11 +54,11 @@ func TestCreateController_Success(t *testing.T) {
 
 func TestCreateController_InvalidScheduledTime(t *testing.T) {
 	mockService := new(MockCreateService)
-	controller := transaction.NewCreateController(mockService)
+	controller := scheduled.NewCreateController(mockService)
 	app := fiber.New()
 	app.Post("/scheduled-transaction", controller.Create)
 
-	reqPayload := transaction.Request{
+	reqPayload := scheduled.Request{
 		From:          "wallet123",
 		To:            "wallet456",
 		Network:       "mainnet",

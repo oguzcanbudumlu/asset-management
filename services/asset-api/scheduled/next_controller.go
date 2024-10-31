@@ -1,14 +1,15 @@
-package scheduled_next
+package scheduled
 
 import (
+	"asset-management/internal/schedule/scheduled_next"
 	"github.com/gofiber/fiber/v2"
 )
 
 type NextController struct {
-	service NextService
+	service scheduled_next.NextService
 }
 
-func NewNextController(service NextService) *NextController {
+func NewNextController(service scheduled_next.NextService) *NextController {
 	return &NextController{service: service}
 }
 

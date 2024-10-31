@@ -1,8 +1,8 @@
-package scheduled_next_test
+package scheduled_test
 
 import (
 	"asset-management/internal/schedule"
-	"asset-management/internal/schedule/scheduled_next"
+	"asset-management/services/asset-api/scheduled"
 	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
@@ -27,7 +27,7 @@ func (m *mockNextService) GetNextMinuteTransactions() ([]schedule.ScheduleTransa
 
 func TestNextController_GetNextMinuteTransactions_Success(t *testing.T) {
 	mockService := new(mockNextService)
-	controller := scheduled_next.NewNextController(mockService)
+	controller := scheduled.NewNextController(mockService)
 
 	app := fiber.New()
 	app.Get("/scheduled-transaction/next-minute", controller.GetNextMinuteTransactions)
@@ -55,7 +55,7 @@ func TestNextController_GetNextMinuteTransactions_Success(t *testing.T) {
 
 func TestNextController_GetNextMinuteTransactions_Error(t *testing.T) {
 	mockService := new(mockNextService)
-	controller := scheduled_next.NewNextController(mockService)
+	controller := scheduled.NewNextController(mockService)
 
 	app := fiber.New()
 	app.Get("/scheduled-transaction/next-minute", controller.GetNextMinuteTransactions)

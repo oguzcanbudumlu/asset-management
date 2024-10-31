@@ -1,4 +1,4 @@
-package transaction
+package scheduled
 
 import (
 	"asset-management/internal/schedule"

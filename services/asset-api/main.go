@@ -7,7 +7,7 @@ import (
 	"asset-management/pkg/logger"
 	deposit2 "asset-management/services/asset-api/deposit"
 	_ "asset-management/services/asset-api/docs"
-	"asset-management/services/asset-api/transaction"
+	"asset-management/services/asset-api/scheduled"
 	"asset-management/services/asset-api/wallet"
 	"asset-management/services/asset-api/withdraw"
 	"database/sql"
@@ -62,9 +62,9 @@ func main() {
 	withdrawS := withdraw.NewService(withdrawR, walletValidator)
 	withdrawC := withdraw.NewController(withdrawS)
 
-	scheduleTransferR := transaction.NewCreateRepository(db.Conn)
-	scheduleTransferS := transaction.NewCreateService(scheduleTransferR, walletValidator)
-	scheduleTransferC := transaction.NewCreateController(scheduleTransferS)
+	scheduleTransferR := scheduled.NewCreateRepository(db.Conn)
+	scheduleTransferS := scheduled.NewCreateService(scheduleTransferR, walletValidator)
+	scheduleTransferC := scheduled.NewCreateController(scheduleTransferS)
 
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)

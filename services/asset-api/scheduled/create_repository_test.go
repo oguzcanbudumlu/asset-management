@@ -1,8 +1,8 @@
-package transaction_test
+package scheduled_test
 
 import (
 	"asset-management/internal/schedule"
-	"asset-management/services/asset-api/transaction"
+	"asset-management/services/asset-api/scheduled"
 	"asset-management/services/asset-api/util"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ func TestPostgresCreateRepository_Create_Success(t *testing.T) {
 	db, cleanup := util.SetupTestContainer(t)
 	defer cleanup()
 
-	repo := transaction.NewCreateRepository(db)
+	repo := scheduled.NewCreateRepository(db)
 
 	tx := &schedule.ScheduleTransaction{
 		FromWallet:    "wallet123",
@@ -34,7 +34,7 @@ func TestPostgresCreateRepository_Create_Failure(t *testing.T) {
 	db, cleanup := util.SetupTestContainer(t)
 	defer cleanup()
 
-	repo := transaction.NewCreateRepository(db)
+	repo := scheduled.NewCreateRepository(db)
 
 	tx := &schedule.ScheduleTransaction{
 		FromWallet:    "",
