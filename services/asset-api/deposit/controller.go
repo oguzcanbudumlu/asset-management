@@ -5,16 +5,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type DepositController interface {
+type Controller interface {
 	Deposit(ctx *fiber.Ctx) error
 }
 
-type depositController struct {
-	service DepositService
+type controller struct {
+	service Service
 }
 
-func NewDepositController(service DepositService) DepositController {
-	return &depositController{service: service}
+func NewController(service Service) Controller {
+	return &controller{service: service}
 }
 
 // Deposit godoc
@@ -27,7 +27,7 @@ func NewDepositController(service DepositService) DepositController {
 // @Success      200  {object}  DepositResponse
 // @Failure      400  {object}  dto.ErrorResponse
 // @Router       /deposit [post]
-func (c *depositController) Deposit(ctx *fiber.Ctx) error {
+func (c *controller) Deposit(ctx *fiber.Ctx) error {
 	var req DepositRequest
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ErrorResponse{Message: "Invalid request payload"})

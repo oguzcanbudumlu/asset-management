@@ -6,19 +6,19 @@ import (
 	"fmt"
 )
 
-type depositService struct {
-	depositRepository DepositRepository
+type service struct {
+	depositRepository Repository
 	validationAdapter wallet.ValidationAdapter
 }
 
-type DepositService interface {
+type Service interface {
 	Deposit(walletAddress, network string, amount float64) (float64, error)
 }
 
-func NewDepositService(adapter wallet.ValidationAdapter, depositRepository DepositRepository) DepositService {
-	return &depositService{validationAdapter: adapter, depositRepository: depositRepository}
+func NewService(adapter wallet.ValidationAdapter, depositRepository Repository) Service {
+	return &service{validationAdapter: adapter, depositRepository: depositRepository}
 }
-func (s *depositService) Deposit(walletAddress, network string, amount float64) (float64, error) {
+func (s *service) Deposit(walletAddress, network string, amount float64) (float64, error) {
 	// Validate input
 	if walletAddress == "" || network == "" || amount <= 0 {
 		return 0, errors.New("invalid input parameters")

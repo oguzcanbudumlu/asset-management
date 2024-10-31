@@ -5,19 +5,22 @@ import (
 	"fmt"
 )
 
-type DepositRepository interface {
+type Repository interface {
 	Deposit(walletAddress, network string, amount float64) (float64, error)
 }
 
-type depositRepository struct {
+type repository struct {
 	db *sql.DB
 }
 
-func NewDepositRepository(db *sql.DB) DepositRepository {
-	return &depositRepository{db: db}
+func NewRepository(db *sql.DB) Repository {
+	return &repository{db: db}
 }
 
-func (r *depositRepository) Deposit(walletAddress, network string, amount float64) (float64, error) {
+func (r *repository) Deposit(walletAddress, network string, amount float64) (float64, error) {
+	if amount <= 0 {
+		return 0, fmt.Errorf("deposit amount must be positive")
+	}
 	// Start a new transaction
 	tx, err := r.db.Begin()
 	if err != nil {

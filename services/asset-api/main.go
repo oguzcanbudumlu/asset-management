@@ -55,9 +55,9 @@ func main() {
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 
 	walletValidator := wallet.NewValidationAdapter(os.Getenv("WALLET_API"))
-	depositR := deposit2.NewDepositRepository(db.Conn)
-	depositS := deposit2.NewDepositService(walletValidator, depositR)
-	depositC := deposit2.NewDepositController(depositS)
+	depositR := deposit2.NewRepository(db.Conn)
+	depositS := deposit2.NewService(walletValidator, depositR)
+	depositC := deposit2.NewController(depositS)
 
 	withdrawR := withdraw.NewWithdrawRepository(db.Conn)
 	withdrawS := withdraw.NewWithdrawService(withdrawR, walletValidator)

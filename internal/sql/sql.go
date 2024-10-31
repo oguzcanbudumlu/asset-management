@@ -4,7 +4,7 @@ const CreateBalanceTableSQL = `
 CREATE TABLE IF NOT EXISTS balance (
 	wallet_address VARCHAR(255) NOT NULL,
 	network VARCHAR(100) NOT NULL,
-	balance NUMERIC(30, 10) NOT NULL DEFAULT 0,
+	balance NUMERIC(30, 10) NOT NULL DEFAULT 0 CHECK (balance >= 0),,
 	UNIQUE (wallet_address, network)
 );
 `
