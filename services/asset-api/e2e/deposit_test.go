@@ -1,97 +1,21 @@
-package deposit_test
+package e2e
 
 import (
-	sql2 "asset-management/internal/sql"
-	"asset-management/services/asset-api/common/dto"
 	"asset-management/services/asset-api/deposit"
+	"asset-management/services/asset-api/dto"
+	"asset-management/services/asset-api/util"
 	"bytes"
-	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/lib/pq"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-type MockValidationAdapter struct {
-	mock.Mock
-}
-
-func (m *MockValidationAdapter) One(walletAddress, network string) error {
-	args := m.Called(walletAddress, network)
-	return args.Error(0)
-}
-
-func (m *MockValidationAdapter) Both(from, to, network string) error {
-	args := m.Called(from, to, network)
-	return args.Error(0)
-}
-
-func SetupTestContainer(t *testing.T) (*sql.DB, func()) {
-	t.Helper()
-	ctx := context.Background()
-
-	// Setting up PostgreSQL container
-	req := testcontainers.ContainerRequest{
-		Image:        "postgres:13",
-		ExposedPorts: []string{"5432/tcp"},
-		Env: map[string]string{
-			"POSTGRES_USER":     "testuser",
-			"POSTGRES_PASSWORD": "testpass",
-			"POSTGRES_DB":       "testdb",
-		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
-	}
-	pgContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Fatalf("Failed to start container: %v", err)
-	}
-
-	// Retrieve the host and port for PostgreSQL
-	host, err := pgContainer.Host(ctx)
-	if err != nil {
-		t.Fatalf("Failed to get container host: %v", err)
-	}
-	port, err := pgContainer.MappedPort(ctx, "5432")
-	if err != nil {
-		t.Fatalf("Failed to get container port: %v", err)
-	}
-
-	// Database connection setup
-	dsn := "postgres://testuser:testpass@" + host + ":" + port.Port() + "/testdb?sslmode=disable"
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		t.Fatalf("Failed to connect to the database: %v", err)
-	}
-
-	// Setup schema
-	_, err = db.Exec(sql2.CreateBalanceTableSQL)
-	assert.NoError(t, err)
-
-	_, err = db.Exec(sql2.CreateBalanceTableSQL)
-	assert.NoError(t, err)
-
-	// Cleanup function to terminate the container
-	cleanup := func() {
-		db.Close()
-		pgContainer.Terminate(ctx)
-	}
-
-	return db, cleanup
-}
-
 func TestDepositEndpoint(t *testing.T) {
-	db, cleanup := SetupTestContainer(t)
+	db, cleanup := util.SetupTestContainer(t)
 	defer cleanup()
 
 	mockValidation := new(MockValidationAdapter)

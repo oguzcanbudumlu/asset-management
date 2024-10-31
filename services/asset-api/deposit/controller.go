@@ -1,12 +1,22 @@
 package deposit
 
 import (
-	"asset-management/services/asset-api/common/dto"
+	"asset-management/services/asset-api/dto"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Controller interface {
 	Deposit(ctx *fiber.Ctx) error
+}
+
+type Request struct {
+	WalletAddress string  `json:"wallet_address" example:"0x123abc456def"`
+	Network       string  `json:"network" example:"Ethereum"`
+	Amount        float64 `json:"amount" example:"100.50"`
+}
+
+type Response struct {
+	NewBalance float64 `json:"new_balance" example:"1500.75"`
 }
 
 type controller struct {

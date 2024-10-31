@@ -1,7 +1,7 @@
 package withdraw_test
 
 import (
-	"asset-management/services/asset-api/common/dto"
+	"asset-management/services/asset-api/dto"
 	"asset-management/services/asset-api/withdraw"
 	"bytes"
 	"encoding/json"

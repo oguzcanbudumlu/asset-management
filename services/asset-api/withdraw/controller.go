@@ -1,7 +1,7 @@
 package withdraw
 
 import (
-	"asset-management/services/asset-api/common/dto"
+	"asset-management/services/asset-api/dto"
 	"github.com/gofiber/fiber/v2"
 )
 

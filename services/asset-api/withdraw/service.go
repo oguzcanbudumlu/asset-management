@@ -32,7 +32,7 @@ func (s *service) Withdraw(walletAddress, network string, amount float64) error 
 
 	repoErr := s.withdrawRepository.Withdraw(walletAddress, network, amount)
 	if repoErr != nil {
-		return fmt.Errorf("withdraw transaction failed: %w", err)
+		return fmt.Errorf("withdraw transaction failed: %w", repoErr)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package deposit_test
 
 import (
 	"asset-management/services/asset-api/deposit"
+	"asset-management/services/asset-api/util"
 	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestRepository_Deposit(t *testing.T) {
-	db, cleanup := SetupTestContainer(t)
+	db, cleanup := util.SetupTestContainer(t)
 	defer cleanup()
 
 	repo := deposit.NewRepository(db)
