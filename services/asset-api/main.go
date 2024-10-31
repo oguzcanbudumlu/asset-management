@@ -1,6 +1,7 @@
 package main
 
 import (
+	sql2 "asset-management/internal/sql"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
@@ -18,28 +19,6 @@ import (
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"os"
 )
-
-const createBalanceTableSQL = `
-CREATE TABLE IF NOT EXISTS balance (
-	wallet_address VARCHAR(255) NOT NULL,
-	network VARCHAR(100) NOT NULL,
-	balance NUMERIC(30, 10) NOT NULL DEFAULT 0,
-	UNIQUE (wallet_address, network)
-);
-`
-
-const createScheduledTransactionsTable = `
-CREATE TABLE IF NOT EXISTS scheduled_transactions (
-    scheduled_transaction_id SERIAL PRIMARY KEY,
-    from_wallet_address VARCHAR(255) NOT NULL,
-    to_wallet_address VARCHAR(255) NOT NULL,
-    network VARCHAR(100) NOT NULL,
-    amount NUMERIC(30, 10) NOT NULL CHECK (amount > 0),
-    scheduled_time TIMESTAMP NOT NULL,
-    status VARCHAR(50) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-`
 
 // @title Asset Service API
 // @version 1.0
@@ -109,11 +88,11 @@ func main() {
 }
 
 func CreateTables(db *sql.DB) error {
-	if _, err := db.Exec(createBalanceTableSQL); err != nil {
+	if _, err := db.Exec(sql2.CreateBalanceTableSQL); err != nil {
 		return fmt.Errorf("failed to create balance table: %w", err)
 	}
 
-	if _, schErr := db.Exec(createScheduledTransactionsTable); schErr != nil {
+	if _, schErr := db.Exec(sql2.CreateScheduledTransactionsTable); schErr != nil {
 		return fmt.Errorf("failed to create scheduled transactions table: %w", schErr)
 	}
 

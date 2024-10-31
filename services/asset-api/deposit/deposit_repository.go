@@ -3,11 +3,10 @@ package deposit
 import (
 	"database/sql"
 	"fmt"
-	"github.com/shopspring/decimal"
 )
 
 type DepositRepository interface {
-	Deposit(walletAddress, network string, amount decimal.Decimal) (decimal.Decimal, error)
+	Deposit(walletAddress, network string, amount float64) (float64, error)
 }
 
 type depositRepository struct {
@@ -18,11 +17,11 @@ func NewDepositRepository(db *sql.DB) DepositRepository {
 	return &depositRepository{db: db}
 }
 
-func (r *depositRepository) Deposit(walletAddress, network string, amount decimal.Decimal) (decimal.Decimal, error) {
+func (r *depositRepository) Deposit(walletAddress, network string, amount float64) (float64, error) {
 	// Start a new transaction
 	tx, err := r.db.Begin()
 	if err != nil {
-		return decimal.Zero, fmt.Errorf("failed to start transaction: %w", err)
+		return 0, fmt.Errorf("failed to start transaction: %w", err)
 	}
 	defer func() {
 		if err != nil {
@@ -41,10 +40,10 @@ func (r *depositRepository) Deposit(walletAddress, network string, amount decima
 		RETURNING balance;
 	`
 
-	var newBalance decimal.Decimal
+	var newBalance float64
 	err = tx.QueryRow(upsertQuery, walletAddress, network, amount).Scan(&newBalance)
 	if err != nil {
-		return decimal.Zero, fmt.Errorf("failed to upsert balance: %w", err)
+		return 0, fmt.Errorf("failed to upsert balance: %w", err)
 	}
 
 	return newBalance, nil

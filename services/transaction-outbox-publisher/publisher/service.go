@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/rs/zerolog/log"
 	kafka2 "github.com/segmentio/kafka-go"
-	"github.com/shopspring/decimal"
 	"os"
 	"time"
 )
@@ -86,7 +85,7 @@ func mockTransactions() []schedule.ScheduleTransaction {
 			FromWallet:    "wallet_ABC123",
 			ToWallet:      "wallet_XYZ789",
 			Network:       "Ethereum",
-			Amount:        decimal.NewFromFloat(250.75),
+			Amount:        250.75,
 			ScheduledTime: time.Date(2024, 10, 31, 15, 0, 0, 0, time.UTC),
 			Status:        "PENDING",
 			CreatedAt:     time.Date(2024, 10, 29, 10, 15, 0, 0, time.UTC),
@@ -96,7 +95,7 @@ func mockTransactions() []schedule.ScheduleTransaction {
 			FromWallet:    "wallet_DEF456",
 			ToWallet:      "wallet_UVW123",
 			Network:       "Bitcoin",
-			Amount:        decimal.NewFromFloat(500.00),
+			Amount:        500.00,
 			ScheduledTime: time.Date(2024, 11, 1, 12, 0, 0, 0, time.UTC),
 			Status:        "PENDING",
 			CreatedAt:     time.Date(2024, 10, 30, 11, 30, 0, 0, time.UTC),

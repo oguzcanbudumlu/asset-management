@@ -78,7 +78,7 @@ func (r *postgresProcessRepository) Process(scheduledTransactionID int) error {
 	rowsAffected, err := res.RowsAffected()
 	if err != nil || rowsAffected == 0 {
 		rollback()
-		return fmt.Errorf("insufficient funds in sender's wallet")
+		return fmt.Errorf("insufficient balance in sender's wallet")
 	}
 
 	// Add to receiver's balance
