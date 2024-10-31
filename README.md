@@ -45,13 +45,13 @@ graph TD
     User[User] -->|Create/Delete Wallet| WalletAPI[Wallet API]
     User -->|Withdraw/Deposit/Scheduled Transactions| AssetAPI[Asset API]
 
-    subgraph WalletDB[Wallet API Database]
+    subgraph WalletDB[Wallet API Postgres Database]
         wallets[["Wallets Table"]]
         wallet_deleteds[["Wallet Deleted Table"]]
     end
     WalletAPI --> WalletDB
 
-    subgraph AssetDB[Asset API Database]
+    subgraph AssetDB[Asset API Postgres Database]
         balance[["Balance Table"]]
         scheduled_transactions[["Scheduled Transactions Table"]]
     end
@@ -296,6 +296,8 @@ The project consists of the following services:
 - **[Asset API](http://localhost:8001)**: Accessible on `http://localhost:8001`.
 - **[Wallet API](http://localhost:8000)**: Accessible on `http://localhost:8000`.
 - **[Transaction Outbox Publisher](http://localhost:8002)**: Accessible on `http://localhost:8002`.
+
+
 
 
 - [ ] Endpoints
