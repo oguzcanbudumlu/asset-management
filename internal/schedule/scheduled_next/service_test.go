@@ -13,9 +13,9 @@ type MockNextRepository struct {
 	mock.Mock
 }
 
-func (m *MockNextRepository) GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error) {
+func (m *MockNextRepository) GetNextMinuteTransactions() ([]schedule.ScheduledTransaction, error) {
 	args := m.Called()
-	if transactions, ok := args.Get(0).([]schedule.ScheduleTransaction); ok {
+	if transactions, ok := args.Get(0).([]schedule.ScheduledTransaction); ok {
 		return transactions, args.Error(1)
 	}
 	return nil, args.Error(1)
@@ -25,7 +25,7 @@ func TestNextService_GetNextMinuteTransactions_Success(t *testing.T) {
 	mockRepo := new(MockNextRepository)
 	service := scheduled_next.NewNextService(mockRepo)
 
-	transactions := []schedule.ScheduleTransaction{
+	transactions := []schedule.ScheduledTransaction{
 		{ID: 1, FromWallet: "wallet123", ToWallet: "wallet456", Network: "mainnet", Amount: 100.50},
 	}
 	mockRepo.On("GetNextMinuteTransactions").Return(transactions, nil)

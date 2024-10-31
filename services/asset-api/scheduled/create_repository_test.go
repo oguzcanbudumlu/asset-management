@@ -16,7 +16,7 @@ func TestPostgresCreateRepository_Create_Success(t *testing.T) {
 
 	repo := scheduled.NewCreateRepository(db)
 
-	tx := &schedule.ScheduleTransaction{
+	tx := &schedule.ScheduledTransaction{
 		FromWallet:    "wallet123",
 		ToWallet:      "wallet456",
 		Network:       "mainnet",
@@ -36,7 +36,7 @@ func TestPostgresCreateRepository_Create_Failure(t *testing.T) {
 
 	repo := scheduled.NewCreateRepository(db)
 
-	tx := &schedule.ScheduleTransaction{
+	tx := &schedule.ScheduledTransaction{
 		FromWallet:    "",
 		ToWallet:      "wallet456",
 		Network:       "mainnet",

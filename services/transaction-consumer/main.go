@@ -69,8 +69,8 @@ func main() {
 			break
 		}
 
-		// Parse message to ScheduleTransaction
-		var transaction schedule.ScheduleTransaction
+		// Parse message to ScheduledTransaction
+		var transaction schedule.ScheduledTransaction
 		err = json.Unmarshal(msg.Value, &transaction)
 		if err != nil {
 			log.Error().Err(err).Msg("Error parsing message")

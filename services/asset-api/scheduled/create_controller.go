@@ -24,7 +24,7 @@ type Request struct {
 // Create godoc
 // @Summary      Create a new scheduled transaction
 // @Description  Schedules a new transaction to be executed at a specified future time
-// @Tags         ScheduleTransaction
+// @Tags         ScheduledTransaction
 // @Accept       json
 // @Produce      json
 // @Param        transaction body Request true "Schedule Transfer request payload"

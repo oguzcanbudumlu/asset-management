@@ -1,9 +1,11 @@
 package scheduled_process
 
 import (
+	"asset-management/internal/schedule"
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/rs/zerolog/log"
 )
 
 type ProcessRepository interface {
@@ -20,6 +22,22 @@ func NewProcessRepository(db *sql.DB) ProcessRepository {
 
 func (r *postgresProcessRepository) Process(scheduledTransactionID int) error {
 	ctx := context.Background()
+
+	// Check if the transaction is already completed
+	var status string
+	err := r.db.QueryRowContext(ctx, `
+        SELECT status FROM scheduled_transactions 
+        WHERE scheduled_transaction_id = $1`, scheduledTransactionID).
+		Scan(&status)
+	if err != nil {
+		return fmt.Errorf("failed to check transaction status: %v", err)
+	}
+
+	if status == schedule.StatusCompleted {
+		// Early exit if transaction is already completed
+		log.Info().Int("scheduledTransactionID", scheduledTransactionID).Msg("Transaction already completed, exiting early")
+		return nil
+	}
 
 	// Begin transaction
 	tx, err := r.db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})

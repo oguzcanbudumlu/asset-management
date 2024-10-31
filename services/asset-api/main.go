@@ -1,6 +1,8 @@
 package main
 
 import (
+	"asset-management/internal/schedule/scheduled_next"
+	"asset-management/internal/schedule/scheduled_process"
 	sql2 "asset-management/internal/sql"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
@@ -62,15 +64,23 @@ func main() {
 	withdrawS := withdraw.NewService(withdrawR, walletValidator)
 	withdrawC := withdraw.NewController(withdrawS)
 
-	scheduleTransferR := scheduled.NewCreateRepository(db.Conn)
-	scheduleTransferS := scheduled.NewCreateService(scheduleTransferR, walletValidator)
-	scheduleTransferC := scheduled.NewCreateController(scheduleTransferS)
+	createScheduledR := scheduled.NewCreateRepository(db.Conn)
+	createScheduledS := scheduled.NewCreateService(createScheduledR, walletValidator)
+	createScheduledC := scheduled.NewCreateController(createScheduledS)
+
+	nextScheduledR := scheduled_next.NewNextRepository(db.Conn)
+	nextScheduledS := scheduled_next.NewNextService(nextScheduledR)
+	nextScheduledC := scheduled.NewNextController(nextScheduledS)
+
+	processScheduledR := scheduled_process.NewProcessRepository(db.Conn)
+	processScheduledS := scheduled_process.NewProcessService(processScheduledR)
+	processScheduledC := scheduled.NewProcessController(processScheduledS)
 
 	appInstance.Fiber.Post("/deposit", depositC.Deposit)
 	appInstance.Fiber.Post("/withdraw", withdrawC.Withdraw)
-	appInstance.Fiber.Post("/scheduled-transaction", scheduleTransferC.Create)
-	//appInstance.Fiber.Get("/scheduled-transaction/next-minute", scheduleTransferC.GetNextMinuteTransactions)
-	//appInstance.Fiber.Post("/scheduled-transaction/:id/process", scheduleTransferC.Process)
+	appInstance.Fiber.Post("/scheduled-transaction", createScheduledC.Create)
+	appInstance.Fiber.Get("/scheduled-transaction/next", nextScheduledC.GetNextMinuteTransactions)
+	appInstance.Fiber.Post("/scheduled-transaction/:id/process", processScheduledC.Process)
 
 	log.Info().Msg("Asset Service is running on port 8081")
 	appInstance.Start(":8001")

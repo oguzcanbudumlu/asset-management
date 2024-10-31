@@ -13,7 +13,7 @@ type MockCreateRepository struct {
 	mock.Mock
 }
 
-func (m *MockCreateRepository) Create(tx *schedule.ScheduleTransaction) (int, error) {
+func (m *MockCreateRepository) Create(tx *schedule.ScheduledTransaction) (int, error) {
 	args := m.Called(tx)
 	return args.Int(0), args.Error(1)
 }

@@ -18,7 +18,7 @@ func NewProcessController(service scheduled_process.ProcessService) *ProcessCont
 // Process godoc
 // @Summary Process a scheduled transaction
 // @Description Processes a scheduled transaction by its ID
-// @Tags Transactions
+// @Tags ScheduledTransaction
 // @Param id path int true "Transaction ID"
 // @Success 200 {object} map[string]string "message": "Transaction processed successfully"
 // @Failure 400 {object} map[string]string "error": "Invalid transaction ID"

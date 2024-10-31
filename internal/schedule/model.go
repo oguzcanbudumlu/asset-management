@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type ScheduleTransaction struct {
+type ScheduledTransaction struct {
 	ID            int       `json:"id" example:"1"`                                // Transaction ID
 	FromWallet    string    `json:"from_wallet" example:"wallet_123"`              // Sender's wallet address
 	ToWallet      string    `json:"to_wallet" example:"wallet_456"`                // Recipient's wallet address

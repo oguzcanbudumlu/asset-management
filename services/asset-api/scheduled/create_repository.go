@@ -7,7 +7,7 @@ import (
 )
 
 type CreateRepository interface {
-	Create(tx *schedule.ScheduleTransaction) (int, error)
+	Create(tx *schedule.ScheduledTransaction) (int, error)
 }
 
 type postgresCreateRepository struct {
@@ -19,7 +19,7 @@ func NewCreateRepository(db *sql.DB) CreateRepository {
 }
 
 // Create inserts a new scheduled transaction into the database.
-func (r *postgresCreateRepository) Create(tx *schedule.ScheduleTransaction) (int, error) {
+func (r *postgresCreateRepository) Create(tx *schedule.ScheduledTransaction) (int, error) {
 	query := `
 		INSERT INTO scheduled_transactions (from_wallet_address, to_wallet_address, network, amount, scheduled_time, status)
 		VALUES ($1, $2, $3, $4, $5, $6) RETURNING scheduled_transaction_id

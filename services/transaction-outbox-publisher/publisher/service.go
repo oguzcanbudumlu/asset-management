@@ -29,15 +29,19 @@ func NewService(nextService scheduled_next.NextService, producer *kafka.Producer
 }
 
 func (s *service) TriggerPublisher() (int, error) {
-	// Retrieve the topic from environment variables once.
 	topic := os.Getenv("KAFKA_TOPIC")
+	enableMockEvent := os.Getenv("ENABLE_MOCK_EVENT")
 
-	transactions := mockTransactions()
-	//transactions, err := s.nextService.GetNextMinuteTransactions()
-	//
-	//if err != nil {
-	//	return 0, err
-	//}
+	var transactions []schedule.ScheduledTransaction
+	var err error
+	if enableMockEvent == "true" {
+		transactions = mockTransactions()
+	} else {
+		transactions, err = s.nextService.GetNextMinuteTransactions()
+		if err != nil {
+			return 0, err
+		}
+	}
 
 	var messages []kafka2.Message
 
@@ -79,8 +83,8 @@ func (s *service) TriggerPublisher() (int, error) {
 	return len(messages), nil
 }
 
-func mockTransactions() []schedule.ScheduleTransaction {
-	return []schedule.ScheduleTransaction{
+func mockTransactions() []schedule.ScheduledTransaction {
+	return []schedule.ScheduledTransaction{
 		{
 			ID:            1,
 			FromWallet:    "wallet_ABC123",

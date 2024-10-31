@@ -29,7 +29,7 @@ func (s *createService) Create(fromWallet, toWallet, network string, amount floa
 		return 0, err
 	}
 
-	tx := &schedule.ScheduleTransaction{
+	tx := &schedule.ScheduledTransaction{
 		FromWallet:    fromWallet,
 		ToWallet:      toWallet,
 		Network:       network,

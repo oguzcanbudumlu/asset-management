@@ -126,6 +126,7 @@ services:
       KAFKA_BROKER: kafka1:9092
       KAFKA_TOPIC: test-topic
       FREQUENCY: "*/10 * * * * *"
+      ENABLE_MOCK_EVENT: true
     depends_on:
       - asset-db
       - kafka1

@@ -3,7 +3,7 @@ package scheduled_next
 import "asset-management/internal/schedule"
 
 type NextService interface {
-	GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error)
+	GetNextMinuteTransactions() ([]schedule.ScheduledTransaction, error)
 }
 
 type nextService struct {
@@ -14,6 +14,6 @@ func NewNextService(repo NextRepository) NextService {
 	return &nextService{repo: repo}
 }
 
-func (s *nextService) GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error) {
+func (s *nextService) GetNextMinuteTransactions() ([]schedule.ScheduledTransaction, error) {
 	return s.repo.GetNextMinuteTransactions()
 }

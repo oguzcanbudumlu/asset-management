@@ -40,32 +40,37 @@
 > We intentionally left some details unspecified to encourage creativity in your approach.
 
 
-### System Architecture Diagram
-
+# System Architecture Diagram
 
 ```mermaid
 graph TD
-    %% Services
-    User -->|Create/Manage Wallets| WalletService[Wallet Service]
-    User -->|Deposit/Withdraw Assets| AssetService[Asset Service]
-    User -->|Schedule Transactions| SchedulerService[Scheduler Service]
-    
-    SchedulerService -->|Sends Scheduled Jobs| MessageQueue[Message Queue]
-    AssetService -->|Consumes Jobs| MessageQueue
+    User[User] -->|Create/Delete Wallet| WalletAPI[Wallet API]
+    User -->|Withdraw/Deposit/Scheduled Transactions| AssetAPI[Asset API]
 
-    %% Database Connection
-    WalletService -->|Accesses| Database[(Central Database)]
-    AssetService -->|Accesses| Database
-
-    %% Components
-    subgraph Components
-        MessageQueue
+    subgraph WalletDB[Wallet API Database]
+        wallets[["Wallets Table"]]
+        wallet_deleteds[["Wallet Deleted Table"]]
     end
+    WalletAPI --> WalletDB
 
-    %% Scheduler-Asset Interaction
-    SchedulerService -->|Scheduled Deposit/Withdraw| MessageQueue
+    subgraph AssetDB[Asset API Database]
+        balance[["Balance Table"]]
+        scheduled_transactions[["Scheduled Transactions Table"]]
+    end
+    AssetAPI -->|Performs Deposit/Withdraw| balance
+    AssetAPI -->|Registers Scheduled Transactions| scheduled_transactions
+
+    AssetAPI -->|Wallet Validation| WalletAPI
+
+    subgraph Kafka
+        KafkaTopic[["Transaction Events Topic"]]
+    end
+    TransactionOutboxPublisher -->|Publishes Event for Scheduled Transactions| KafkaTopic
+    KafkaTopic -->|Triggers Processing| TransactionConsumer
+    TransactionConsumer -->|Transfers Funds| balance
+    TransactionConsumer -->|Updates Status to Completed| scheduled_transactions
+
+    TransactionOutboxPublisher -->|Polls for Due Transactions| scheduled_transactions
+
+
 ```
-
-- TODO
-- test (testcontainer, unit, integration(mock, controller test), e2e(testcontainer, wiremock))
-- id?

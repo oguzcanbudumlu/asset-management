@@ -7,7 +7,7 @@ import (
 )
 
 type NextRepository interface {
-	GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error)
+	GetNextMinuteTransactions() ([]schedule.ScheduledTransaction, error)
 }
 
 type postgresNextRepository struct {
@@ -18,7 +18,7 @@ func NewNextRepository(db *sql.DB) NextRepository {
 	return &postgresNextRepository{db: db}
 }
 
-func (r *postgresNextRepository) GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error) {
+func (r *postgresNextRepository) GetNextMinuteTransactions() ([]schedule.ScheduledTransaction, error) {
 	rows, err := r.db.Query(`
         SELECT scheduled_transaction_id, from_wallet_address, to_wallet_address, network, amount, scheduled_time, status, created_at
         FROM scheduled_transactions
@@ -30,9 +30,9 @@ func (r *postgresNextRepository) GetNextMinuteTransactions() ([]schedule.Schedul
 		return nil, err
 	}
 
-	var transactions []schedule.ScheduleTransaction
+	var transactions []schedule.ScheduledTransaction
 	for rows.Next() {
-		var txn schedule.ScheduleTransaction
+		var txn schedule.ScheduledTransaction
 		if err := rows.Scan(&txn.ID, &txn.FromWallet, &txn.ToWallet, &txn.Network, &txn.Amount, &txn.ScheduledTime, &txn.Status, &txn.CreatedAt); err != nil {
 			return nil, err
 		}
