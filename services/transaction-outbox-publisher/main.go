@@ -1,7 +1,7 @@
 package main
 
 import (
-	"asset-management/internal/schedule"
+	scheduled_next2 "asset-management/internal/schedule/scheduled_next"
 	"asset-management/pkg/app"
 	"asset-management/pkg/database"
 	"asset-management/pkg/kafka"
@@ -41,8 +41,8 @@ func main() {
 
 	appInstance.AddRoute("/swagger/*", fiberSwagger.WrapHandler)
 
-	nextRepo := schedule.NewNextRepository(db.Conn)
-	nextService := schedule.NewNextService(nextRepo)
+	nextRepo := scheduled_next2.NewNextRepository(db.Conn)
+	nextService := scheduled_next2.NewNextService(nextRepo)
 	kafkaProducer := kafka.NewProducer(os.Getenv("KAFKA_BROKER"), os.Getenv("KAFKA_TOPIC"))
 
 	s := publisher.NewService(nextService, kafkaProducer)

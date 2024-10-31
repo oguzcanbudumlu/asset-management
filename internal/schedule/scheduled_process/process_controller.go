@@ -1,4 +1,4 @@
-package schedule
+package scheduled_process
 
 import (
 	"fmt"

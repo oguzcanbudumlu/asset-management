@@ -1,4 +1,4 @@
-package schedule
+package scheduled_next
 
 import (
 	"github.com/gofiber/fiber/v2"

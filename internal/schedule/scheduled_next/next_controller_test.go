@@ -1,0 +1,79 @@
+package scheduled_next_test
+
+import (
+	"asset-management/internal/schedule"
+	"asset-management/internal/schedule/scheduled_next"
+	"encoding/json"
+	"errors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+type mockNextService struct {
+	mock.Mock
+}
+
+func (m *mockNextService) GetNextMinuteTransactions() ([]schedule.ScheduleTransaction, error) {
+	args := m.Called()
+	if transactions, ok := args.Get(0).([]schedule.ScheduleTransaction); ok {
+		return transactions, args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func TestNextController_GetNextMinuteTransactions_Success(t *testing.T) {
+	mockService := new(mockNextService)
+	controller := scheduled_next.NewNextController(mockService)
+
+	app := fiber.New()
+	app.Get("/scheduled-transaction/next-minute", controller.GetNextMinuteTransactions)
+
+	// Mock successful response
+	transactions := []schedule.ScheduleTransaction{
+		{ID: 1, FromWallet: "wallet123", ToWallet: "wallet456", Network: "mainnet", Amount: 100.50},
+	}
+	mockService.On("GetNextMinuteTransactions").Return(transactions, nil)
+
+	// Create HTTP request
+	req := httptest.NewRequest(http.MethodGet, "/scheduled-transaction/next-minute", nil)
+	resp, err := app.Test(req)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var response []schedule.ScheduleTransaction
+	json.NewDecoder(resp.Body).Decode(&response)
+	assert.Equal(t, transactions, response)
+
+	mockService.AssertExpectations(t)
+}
+
+func TestNextController_GetNextMinuteTransactions_Error(t *testing.T) {
+	mockService := new(mockNextService)
+	controller := scheduled_next.NewNextController(mockService)
+
+	app := fiber.New()
+	app.Get("/scheduled-transaction/next-minute", controller.GetNextMinuteTransactions)
+
+	// Mock error response
+	mockService.On("GetNextMinuteTransactions").Return(nil, errors.New("service error"))
+
+	// Create HTTP request
+	req := httptest.NewRequest(http.MethodGet, "/scheduled-transaction/next-minute", nil)
+	resp, err := app.Test(req)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
+
+	var response map[string]string
+	json.NewDecoder(resp.Body).Decode(&response)
+	assert.Equal(t, "Failed to retrieve transactions", response["error"])
+
+	mockService.AssertExpectations(t)
+}

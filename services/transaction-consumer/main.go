@@ -2,6 +2,7 @@ package main
 
 import (
 	"asset-management/internal/schedule"
+	"asset-management/internal/schedule/scheduled_process"
 	"asset-management/pkg/database"
 	"asset-management/pkg/logger"
 	"context"
@@ -56,8 +57,8 @@ func main() {
 		log.Error().Err(err).Msg("Failed to initialize database")
 		return
 	}
-	processRepo := schedule.NewProcessRepository(db.Conn)
-	processServ := schedule.NewProcessService(processRepo)
+	processRepo := scheduled_process.NewProcessRepository(db.Conn)
+	processServ := scheduled_process.NewProcessService(processRepo)
 
 	// Start consuming messages
 	for {

@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"asset-management/internal/schedule"
+	"asset-management/internal/schedule/scheduled_next"
 	"asset-management/pkg/kafka"
 	"context"
 	"encoding/json"
@@ -12,7 +13,7 @@ import (
 )
 
 type service struct {
-	nextService schedule.NextService
+	nextService scheduled_next.NextService
 	producer    *kafka.Producer
 }
 
@@ -20,7 +21,7 @@ type Service interface {
 	TriggerPublisher() (int, error)
 }
 
-func NewService(nextService schedule.NextService, producer *kafka.Producer) Service {
+func NewService(nextService scheduled_next.NextService, producer *kafka.Producer) Service {
 	return &service{
 		nextService: nextService,
 		producer:    producer,
