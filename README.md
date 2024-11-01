@@ -297,7 +297,138 @@ The project consists of the following services:
 - **[Wallet API](http://localhost:8000)**: Accessible on `http://localhost:8000`.
 - **[Transaction Outbox Publisher](http://localhost:8002)**: Accessible on `http://localhost:8002`.
 
+## Endpoints
+
+### Asset Service API
+
+![asset-swagger.png](docs/images/asset-swagger.png)
+
+- **POST /deposit**  
+  Deposits assets into the account.
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8001/deposit' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "amount": 100.5,
+  "network": "ETH",
+  "wallet_address": "0x123"
+}'
+```
+
+- **POST /scheduled-transaction**  
+  Creates a new scheduled transaction.
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8001/scheduled-transaction' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "amount": 80,
+  "from": "0x123",
+  "network": "ETH",
+  "scheduled_time": "2024-11-01T03:05:00Z",
+  "to": "0x456"
+}'
+```
+
+- **GET /scheduled-transaction/next**  
+  Retrieves transactions scheduled for the next publisher iteration.
+
+```shell
+curl -X 'GET' \
+  'http://localhost:8001/scheduled-transaction/next' \
+  -H 'accept: application/json'
+```
+
+
+- **POST /scheduled-transaction/{id}/process**  
+  Processes a specific scheduled transaction without looking at scheduled_time.
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8001/scheduled-transaction/3/process' \
+  -H 'accept: application/json' \
+  -d ''
+```
+
+- **POST /withdraw**  
+  Withdraws assets from the account.
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8001/withdraw' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "amount": 1,
+  "network": "ETH",
+  "wallet_address": "0x123"
+}'
+```
+
+
+---
+
+### Wallet Service API
+
+![wallet-swagger.png](docs/images/wallet-swagger.png)
+
+- **POST /wallet**  
+  Creates a new wallet.
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8000/wallet' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "address": "0x123",
+  "network": "ETH"
+}'
+```
+
+- **GET /wallet/{network}/{address}**  
+  Retrieves a wallet by network and address.
+
+```shell
+curl -X 'GET' \
+  'http://localhost:8000/wallet/ETH/0x123' \
+  -H 'accept: application/json'
+```
+
+- **DELETE /wallet/{network}/{address}**  
+  Deletes a wallet based on the specified network and address.
+
+```shell
+curl -X 'DELETE' \
+  'http://localhost:8000/wallet/ETH/0x123' \
+  -H 'accept: application/json'
+```
 
 
 
-- [ ] Endpoints
+---
+
+### Transaction Outbox Publisher API
+
+
+- **POST /trigger-publisher**  
+  Manually triggers the event publisher to send out events.
+
+![publisher-swagger.png](docs/images/publisher-swagger.png)
+
+```shell
+curl -X 'POST' \
+  'http://localhost:8002/trigger-publisher' \
+  -H 'accept: application/json' \
+  -d ''
+```
+
+---
+
+
+
